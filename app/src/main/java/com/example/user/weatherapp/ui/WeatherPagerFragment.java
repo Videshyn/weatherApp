@@ -3,8 +3,15 @@ package com.example.user.weatherapp.ui;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -18,8 +25,6 @@ import com.google.gson.Gson;
 
 import java.math.BigDecimal;
 
-import static com.example.user.weatherapp.utils.Const.LAT;
-import static com.example.user.weatherapp.utils.Const.LNG;
 import static com.example.user.weatherapp.utils.Const.PAGER_POSITION;
 import static com.example.user.weatherapp.utils.Const.PNG;
 import static com.example.user.weatherapp.utils.Const.RESPONSE;
@@ -49,10 +54,12 @@ public class WeatherPagerFragment extends Fragment {
     }
 
         private void initUI(View view){
-//        toolbar = view.findViewById(R.id.toolbar);
+//        Toolbar toolbar = view.findViewById(R.id.toolbar_in_pager);
 //        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-//        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
-//        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         img = view.findViewById(R.id.img_full_fragment);
         temperature = view.findViewById(R.id.temperature_full_fragment);
         temperatureMin = view.findViewById(R.id.min_temperature_full_fragment);
@@ -77,26 +84,66 @@ public class WeatherPagerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.pager_fragment, container, false);
         initUI(view);
-
+        int dayNum = 0;
         switch (pagerPosition){
             case 0:
-                Glide.with(img.getContext()).load(Const.ICON_URL + weatherMapJSON.getList().get(0).getWeather().get(0).getIcon() + PNG).into(img);
-                double temp = new BigDecimal(weatherMapJSON.getList().get(0).getMain().getTemp() - 273.15).setScale(2, BigDecimal.ROUND_UP).doubleValue();
-                temperature.setText("Temperature now = " + temp + " °C");
+                fillPagerFragment(dayNum);
                 break;
             case 1:
+                dayNum = 8;
+                fillPagerFragment(dayNum);
+                Log.d(TAG, "date8 = " + weatherMapJSON.getList().get(8).getDtTxt());
                 break;
             case 2:
+                dayNum = 16;
+                Log.d(TAG, "date16 = " + weatherMapJSON.getList().get(16).getDtTxt());
+                fillPagerFragment(dayNum);
                 break;
             case 3:
+                dayNum = 24;
+                Log.d(TAG, "date24 = " + weatherMapJSON.getList().get(24).getDtTxt());
+                fillPagerFragment(dayNum);
                 break;
             case 4:
+                dayNum = 32;
+                Log.d(TAG, "date32 = " + weatherMapJSON.getList().get(32).getDtTxt());
+                fillPagerFragment(dayNum);
                 break;
             default:
                 break;
         }
 
-
+        setHasOptionsMenu(true);
         return view;
+    }
+
+    private void fillPagerFragment(int dayNum){
+        Glide.with(img.getContext()).load(Const.ICON_URL + weatherMapJSON.getList().get(dayNum).getWeather().get(0).getIcon() + PNG).into(img);
+        double temp = new BigDecimal(weatherMapJSON.getList().get(dayNum).getMain().getTemp() - 273.15).setScale(2, BigDecimal.ROUND_UP).doubleValue();
+        temperature.setText("Temperature now = " + temp + " °C");
+        double tempMin = new BigDecimal(weatherMapJSON.getList().get(dayNum).getMain().getTempMin() - 273.15).setScale(2, BigDecimal.ROUND_UP).doubleValue();
+        temperatureMin.setText("min temperature = " + tempMin + " °C");
+        double tempMax = new BigDecimal(weatherMapJSON.getList().get(dayNum).getMain().getTempMax() - 273.15).setScale(2, BigDecimal.ROUND_UP).doubleValue();
+        temperatureMax.setText("max temperature = " + tempMax + " °C");
+        pressure.setText("pressure = " + weatherMapJSON.getList().get(dayNum).getMain().getPressure() + "mbar");
+        humidity.setText("humidity = " + weatherMapJSON.getList().get(dayNum).getMain().getHumidity() + "%");
+        description.setText("description: " + weatherMapJSON.getList().get(dayNum).getWeather().get(0).getDescription());
+        if (weatherMapJSON.getList().get(0).getWind() != null){
+            wind.setText("WindCity speed = "  + weatherMapJSON.getList().get(dayNum).getWind().getSpeed() + "km/h");
+        }else {
+            wind.setText("WindCity speed = 0.0km/h");
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        return super.onOptionsItemSelected(item);
     }
 }
