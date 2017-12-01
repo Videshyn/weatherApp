@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">WeatherApp</string>
+    <string name="btn_ok">ok</string>
+    <string name="wrong">Wrong cords, enter new:</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="wait_location">Please, wait.\nWe search your location</string>
+    <string name="error_network">Error! On your internet\nand try again.</string>
+    <string name="retry">retry</string>
+    <string name="title_network_error">Network error</string>
+    <string name="title_progress_dialog">Progress...</string>
+    <string name="search">search</string>
+</resources>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <FrameLayout
+        style="@style/Theme.AppCompat.DayNight.NoActionBar"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/container"
+        tools:context="com.example.user.weatherapp.ui.MainActivity">
+
+    <!--<android.support.v4.view.ViewPager-->
+        <!--android:id="@+id/pager_view"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent">-->
+        <!--<android.support.v4.view.PagerTitleStrip-->
+            <!--android:id="@+id/title_strip_view"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content">-->
+            <!---->
+        <!--</android.support.v4.view.PagerTitleStrip>-->
+    <!--</android.support.v4.view.ViewPager>-->
+    </FrameLayout>
