@@ -19,8 +19,8 @@ import android.widget.TextView;
 
 import com.example.user.weatherapp.R;
 import com.example.user.weatherapp.pojo.city_pojo.ExampleCity;
-import com.example.user.weatherapp.pojo.coords_pojo.CoordsPojoList;
 import com.example.user.weatherapp.pojo.coords_pojo.Example;
+import com.example.user.weatherapp.pojo.coords_pojo.List;
 import com.example.user.weatherapp.pojo.pojo_robot.ListItem;
 import com.example.user.weatherapp.pojo.pojo_robot.OpenWeatherMapJSON;
 import com.example.user.weatherapp.retrofit.WeatherAPI;
@@ -28,7 +28,6 @@ import com.example.user.weatherapp.utils.Const;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -48,7 +47,7 @@ public class WeatherDescriptionFragment extends Fragment {
     private ImageView img;
     private TextView temperature, temperatureMax, temperatureMin, pressure, humidity, description, wind;
     private String responce;
-    private List<ListItem> weekList = new ArrayList<>();
+    private java.util.List<ListItem> weekList = new ArrayList<>();
     private OpenWeatherMapJSON weatherMapJSON = new OpenWeatherMapJSON();
     private CityListFragment.Listener listener;
 
@@ -90,14 +89,14 @@ public class WeatherDescriptionFragment extends Fragment {
         Integer idCity = 0;
         if (checkParam == Const.MANY_ELEMENTS){
             Example example = new Gson().fromJson(json, Example.class);
-            List<CoordsPojoList> exampleCoordsPojoList = example.getCoordsPojoList();
-            idCity = exampleCoordsPojoList.get(position).getId();
+            java.util.List<List> exampleList = example.getList();
+            idCity = exampleList.get(position).getId();
         }else if (checkParam == Const.ONE_ELEMENT) {
             ExampleCity exampleCity = new Gson().fromJson(json, ExampleCity.class);
             idCity = exampleCity.getId();
         }
-        WeatherAPI
-                .getClient()
+
+        WeatherAPI.getClient()
                 .create(WeatherAPI.FiveDaysWeather.class)
                 .getFiveDaysWeather(idCity, Const.KEY)
                 .subscribeOn(Schedulers.io())
@@ -113,6 +112,7 @@ public class WeatherDescriptionFragment extends Fragment {
                     viewPager.setAdapter(new MyPagerAdapter(getChildFragmentManager(), responce));
                     toolbar.setTitle(fiveDays.getCity().getName() + "");
             });
+
     }
 
     @Override
@@ -136,7 +136,7 @@ public class WeatherDescriptionFragment extends Fragment {
 //        if (checkParam == 100){
 //            Log.d(TAG, "json" + json);
 //            Example example = new Gson().fromJson(json, Example.class);
-//            java.util.CoordsPojoList<CoordsPojoList> exampleList = example.getCoordsPojoList();
+//            java.util.List<List> exampleList = example.getList();
 //            toolbar.setTitle(exampleList.get(position).getName() + "");
 //            Glide.with(img.getContext()).load(ICON_URL
 //                    + exampleList.get(position).getWeather().get(0).getIcon()

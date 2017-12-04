@@ -11,7 +11,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.example.user.weatherapp.R;
 import com.example.user.weatherapp.pojo.city_pojo.ExampleCity;
-import com.example.user.weatherapp.pojo.coords_pojo.CoordsPojoList;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -26,12 +25,12 @@ import static com.example.user.weatherapp.utils.Const.PNG;
 public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHolder> {
 
     private static final String TAG = WeatherAdapter.class.getSimpleName();
-    public List<CoordsPojoList> coordsPojoLists;
+    public List<com.example.user.weatherapp.pojo.coords_pojo.List> lists;
     private Listener weatherAdapterListener;
     private ExampleCity exampleCity;
 
-    public WeatherAdapter(List<CoordsPojoList> coordsPojoLists, Listener weatherAdapterListener) {
-        this.coordsPojoLists = coordsPojoLists;
+    public WeatherAdapter(List<com.example.user.weatherapp.pojo.coords_pojo.List> lists, Listener weatherAdapterListener) {
+        this.lists = lists;
         this.weatherAdapterListener = weatherAdapterListener;
     }
 
@@ -60,23 +59,23 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
             Glide.with(img.getContext()).load(ICON_URL + exampleCity.getWeather().get(0).getIcon() + PNG).into(img);
             cardView.setOnClickListener(v -> weatherAdapterListener.clickElement(exampleCity));
         }else {
-            cityName.setText(coordsPojoLists.get(position).getName());
-            double temp = new BigDecimal(coordsPojoLists.get(position).getMain().getTemp() - 273.15).setScale(1, BigDecimal.ROUND_UP).doubleValue();
+            cityName.setText(lists.get(position).getName());
+            double temp = new BigDecimal(lists.get(position).getMain().getTemp() - 273.15).setScale(1, BigDecimal.ROUND_UP).doubleValue();
             temperature.setText(temp + "°C");
-            Glide.with(img.getContext()).load(ICON_URL + coordsPojoLists.get(position).getWeather().get(0).getIcon() + PNG).into(img);
-            cardView.setOnClickListener(v -> weatherAdapterListener.clickElement(coordsPojoLists, position));
+            Glide.with(img.getContext()).load(ICON_URL + lists.get(position).getWeather().get(0).getIcon() + PNG).into(img);
+            cardView.setOnClickListener(v -> weatherAdapterListener.clickElement(lists, position));
 
-            Log.d(TAG, "position = " + position + " cnt = " + coordsPojoLists.size());
-//            if ((position + 1) >= getItemCount() && coordsPojoLists.size() < 50){
+            Log.d(TAG, "position = " + position + " cnt = " + lists.size());
+//            if ((position + 1) >= getItemCount() && lists.size() < 50){
 //                try {
 //                    Thread.sleep(500);
 //                } catch (InterruptedException e) {
 //                    e.printStackTrace();
 //                }
-//                weatherAdapterListener.loadNextPack(position, (coordsPojoLists.size() + 9));
+//                weatherAdapterListener.loadNextPack(position, (lists.size() + 9));
 //
 //            }
-            Log.d(TAG, "list size = " + coordsPojoLists.size());
+            Log.d(TAG, "list size = " + lists.size());
         }
     }
 
@@ -85,7 +84,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
         if (exampleCity != null){
             return 1;
         }else
-            return coordsPojoLists.size();
+            return lists.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -97,7 +96,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
     }
 
     public interface Listener {
-        void clickElement(List<CoordsPojoList> coordsPojoLists, int position);
+        void clickElement(List<com.example.user.weatherapp.pojo.coords_pojo.List> lists, int position);
         void clickElement(ExampleCity exampleCity);
 //        void loadNextPack(int down_limit, int up_limit);
     }

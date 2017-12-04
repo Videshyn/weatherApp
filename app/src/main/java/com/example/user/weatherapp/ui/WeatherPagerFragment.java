@@ -51,7 +51,7 @@ public class WeatherPagerFragment extends Fragment {
         return fragment;
     }
 
-        private void initUI(View view){
+    private void initUI(View view){
         img = view.findViewById(R.id.img_full_fragment);
         temperature = view.findViewById(R.id.temperature_full_fragment);
         temperatureMin = view.findViewById(R.id.min_temperature_full_fragment);
