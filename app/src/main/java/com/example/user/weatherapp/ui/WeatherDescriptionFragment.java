@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -82,6 +83,11 @@ public class WeatherDescriptionFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_weather_description, container, false);
         ViewPager viewPager = view.findViewById(R.id.pager);
         callWeatherWeekAPI(viewPager);
+        Toolbar toolbar = view.findViewById(R.id.toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setHasOptionsMenu(true);
         return view;
     }
     private void callWeatherWeekAPI(ViewPager viewPager){
@@ -110,6 +116,8 @@ public class WeatherDescriptionFragment extends Fragment {
                 responce = new Gson().toJson(weatherMapJSON, OpenWeatherMapJSON.class);
                 Log.d(TAG, "responce = " + responce);
                 viewPager.setAdapter(new MyPagerAdapter(getChildFragmentManager(), responce));
+
+
             });
 
     }

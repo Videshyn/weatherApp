@@ -54,11 +54,6 @@ public class WeatherPagerFragment extends Fragment {
     }
 
         private void initUI(View view){
-//        Toolbar toolbar = view.findViewById(R.id.toolbar_in_pager);
-//        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         img = view.findViewById(R.id.img_full_fragment);
         temperature = view.findViewById(R.id.temperature_full_fragment);
