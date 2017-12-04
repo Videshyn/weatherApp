@@ -21,7 +21,7 @@ public class ExampleCity {
     private MainCity main;
     @SerializedName("visibility")
     @Expose
-    private Integer visibility;
+    private Double visibility;
     @SerializedName("wind")
     @Expose
     private WindCity wind;
@@ -30,7 +30,7 @@ public class ExampleCity {
     private CloudsCity clouds;
     @SerializedName("dt")
     @Expose
-    private Integer dt;
+    private Double dt;
     @SerializedName("sys")
     @Expose
     private SysCity sys;
@@ -76,11 +76,11 @@ public class ExampleCity {
         this.main = main;
     }
 
-    public Integer getVisibility() {
+    public Double getVisibility() {
         return visibility;
     }
 
-    public void setVisibility(Integer visibility) {
+    public void setVisibility(Double visibility) {
         this.visibility = visibility;
     }
 
@@ -100,11 +100,11 @@ public class ExampleCity {
         this.clouds = clouds;
     }
 
-    public Integer getDt() {
+    public Double getDt() {
         return dt;
     }
 
-    public void setDt(Integer dt) {
+    public void setDt(Double dt) {
         this.dt = dt;
     }
 

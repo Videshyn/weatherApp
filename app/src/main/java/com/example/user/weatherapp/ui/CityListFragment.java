@@ -51,7 +51,7 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
     private double lng;
     private RecyclerView recyclerView;
     private WeatherAdapter adapter;
-    private Listener weatherFragmentListener;
+    private Listener listener;
     private View view;
     private Example example;
     private List<com.example.user.weatherapp.pojo.coords_pojo.List> exampleList = new ArrayList<>();
@@ -91,17 +91,22 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(example -> {
+                    Log.d(TAG, "callAPI: subscribe");
                     this.example = example;
 //                    loadNextPack(0, 50);
                     exampleList = example.getList();
                     adapter = new WeatherAdapter(exampleList, this);
                     recyclerView.setAdapter(adapter);
-                    if (weatherFragmentListener != null){
-                        weatherFragmentListener.closeProgressDialog();
+                    if (listener != null){
+                        listener.closeProgressDialog();
                     }
                     if (swipeRefreshLayout.isRefreshing()){
                         swipeRefreshLayout.setRefreshing(false);
                     }
+                }, error -> {
+                    Log.d(TAG, "callAPI: on error");
+                    Toast.makeText(getContext(), "Correct your request!", Toast.LENGTH_LONG).show();
+                    listener.refreshCoords();
                 });
     }
 
@@ -192,7 +197,7 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
     @Override
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(true);
-        weatherFragmentListener.refreshCoords();
+        listener.refreshCoords();
         callAPI(lat, lng);
 
         Log.d(TAG, "after setRefreshing false");
@@ -208,7 +213,7 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
         super.onAttach(context);
         Log.d(TAG, "call onAttach()");
         if (context instanceof Listener){
-            weatherFragmentListener = (Listener) context;
+            listener = (Listener) context;
         }else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -219,7 +224,7 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
     public void onDetach() {
         Log.d(TAG, "call onDetach: ");
         super.onDetach();
-        weatherFragmentListener = null;
+        listener = null;
     }
 
     @Override
@@ -260,8 +265,8 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(example -> {
-                    if (weatherFragmentListener != null){
-                        weatherFragmentListener.closeProgressDialog();
+                    if (listener != null){
+                        listener.closeProgressDialog();
                     }
                             Log.d(TAG, "onQueryTextSubmit: " + example.getName());
                             adapter = new WeatherAdapter(example, this);
@@ -289,13 +294,13 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(false);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 //        Log.d(TAG, "in clickback list size = " + exampleList.size());
-        weatherFragmentListener.openProgressDialog();
+        listener.openProgressDialog();
         callAPI(lat, lng);
     }
     public void clickBackCallCityAPI(){
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(false);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        weatherFragmentListener.openProgressDialog();
+        listener.openProgressDialog();
         callCityAPI(lastCity);
     }
 

@@ -20,7 +20,7 @@ public class List {
     private Main main;
     @SerializedName("dt")
     @Expose
-    private Integer dt;
+    private Double dt;
     @SerializedName("wind")
     @Expose
     private Wind wind;
@@ -72,11 +72,11 @@ public class List {
         this.main = main;
     }
 
-    public Integer getDt() {
+    public Double getDt() {
         return dt;
     }
 
-    public void setDt(Integer dt) {
+    public void setDt(Double dt) {
         this.dt = dt;
     }
 

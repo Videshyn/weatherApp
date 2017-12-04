@@ -59,6 +59,9 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
             Glide.with(img.getContext()).load(ICON_URL + exampleCity.getWeather().get(0).getIcon() + PNG).into(img);
             cardView.setOnClickListener(v -> weatherAdapterListener.clickElement(exampleCity));
         }else {
+            if (lists.size() == 0){
+                cityName.setText("Nothing to show");
+            }
             cityName.setText(lists.get(position).getName());
             double temp = new BigDecimal(lists.get(position).getMain().getTemp() - 273.15).setScale(1, BigDecimal.ROUND_UP).doubleValue();
             temperature.setText(temp + "°C");

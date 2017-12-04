@@ -14,7 +14,7 @@ public class Example {
     private String cod;
     @SerializedName("count")
     @Expose
-    private Integer count;
+    private Double count;
     @SerializedName("list")
     @Expose
     private java.util.List<List> list = null;
@@ -35,11 +35,11 @@ public class Example {
         this.cod = cod;
     }
 
-    public Integer getCount() {
+    public Double getCount() {
         return count;
     }
 
-    public void setCount(Integer count) {
+    public void setCount(Double count) {
         this.count = count;
     }
 
