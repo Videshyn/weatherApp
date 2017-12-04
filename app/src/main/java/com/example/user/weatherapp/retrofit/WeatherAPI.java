@@ -19,6 +19,7 @@ import retrofit2.http.Query;
  */
 
 public class WeatherAPI {
+
     private static final String TAG = "logs";
     public static String KEY = "9f6dc9e441d2f589ff7e472d7d352a61";
     public static final String BASE_URL = "http://api.openweathermap.org/data/2.5/";
@@ -51,25 +52,14 @@ public class WeatherAPI {
         );
     }
 
-//    public interface WeekResponce{
-//        @GET("forecast")
-//        Call<WeekWeather> getWeek(
-//                @Query("id") int id,
-//                @Query("appid") String appid
-//        );
-//    }
-
     public static Retrofit getClient() {
-        Log.d(TAG, "getClient: ");
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
-            Log.d(TAG, "getClient: " + retrofit.toString());
         }
         return retrofit;
     }
-
 }

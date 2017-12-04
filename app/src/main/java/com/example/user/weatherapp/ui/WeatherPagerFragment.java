@@ -3,10 +3,6 @@ package com.example.user.weatherapp.ui;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -56,7 +52,6 @@ public class WeatherPagerFragment extends Fragment {
     }
 
         private void initUI(View view){
-
         img = view.findViewById(R.id.img_full_fragment);
         temperature = view.findViewById(R.id.temperature_full_fragment);
         temperatureMin = view.findViewById(R.id.min_temperature_full_fragment);
@@ -109,16 +104,13 @@ public class WeatherPagerFragment extends Fragment {
             default:
                 break;
         }
-
         setHasOptionsMenu(true);
         return view;
     }
 
     private void fillPagerFragment(int plusDays){
-
         String fullTmp = "";
         String jodaDay = new DateTime().plusDays(plusDays).toLocalDate().toString();
-
         for (int i = 0, n = weatherMapJSON.getList().size(); i < n; i ++){
             String loopToday = weatherMapJSON.getList().get(i).getDtTxt().split(" ")[0];
             if (loopToday.equals(jodaDay)){
@@ -146,13 +138,11 @@ public class WeatherPagerFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         return super.onOptionsItemSelected(item);
     }
 }

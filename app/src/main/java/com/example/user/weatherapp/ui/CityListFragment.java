@@ -2,7 +2,6 @@ package com.example.user.weatherapp.ui;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -25,6 +24,7 @@ import android.widget.Toast;
 
 import com.example.user.weatherapp.R;
 import com.example.user.weatherapp.pojo.city_pojo.ExampleCity;
+import com.example.user.weatherapp.pojo.coords_pojo.CoordsPojoList;
 import com.example.user.weatherapp.retrofit.WeatherAPI;
 import com.example.user.weatherapp.pojo.coords_pojo.Example;
 import com.google.gson.Gson;
@@ -46,20 +46,26 @@ import static com.example.user.weatherapp.utils.Const.ONE_ELEMENT;
  * Created by User on 16.10.2017
  */
 
-public class CityListFragment extends Fragment implements WeatherAdapter.WeatherAdapterListener, SwipeRefreshLayout.OnRefreshListener, SearchView.OnQueryTextListener{
+public class CityListFragment extends Fragment implements WeatherAdapter.Listener, SwipeRefreshLayout.OnRefreshListener, SearchView.OnQueryTextListener{
     private static final String TAG = CityListFragment.class.getSimpleName();
     private double lat;
     private double lng;
     private RecyclerView recyclerView;
     private WeatherAdapter adapter;
-    private Listener weatherFragmentListener;
+    private Listener listener;
     private View view;
     private Example example;
-    private List<com.example.user.weatherapp.pojo.coords_pojo.List> exampleList = new ArrayList<>();
+    private List<CoordsPojoList> exampleCoordsPojoList = new ArrayList<>();
     private SwipeRefreshLayout swipeRefreshLayout;
     private SearchView searchView;
     private boolean toolBarFlag = false;
     public String lastCity;
+
+    public interface Listener {
+        void closeProgressDialog();
+        void refreshCoords();
+        void openProgressDialog();
+    }
 
     public static CityListFragment newInstance(double lat, double lng) {
         Log.d(TAG, "call newInstance:");
@@ -76,8 +82,6 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Weather
         }else return -1;
     }
 
-
-
     private void setLat(){
         lat = getArguments().getDouble(LAT);
     }
@@ -86,7 +90,7 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Weather
     }
 
     private void callAPI(double latitude, double longitude){
-        Log.d(TAG, "callAPI: exampleList size = " + exampleList.size());
+        Log.d(TAG, "callAPI: exampleCoordsPojoList size = " + exampleCoordsPojoList.size());
         WeatherAPI.getClient().create(WeatherAPI.WeatherInterface.class)
                 .getAll(latitude, longitude, DEFAULT_CNT, KEY)
                 .subscribeOn(Schedulers.io())
@@ -94,11 +98,11 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Weather
                 .subscribe(example -> {
                     this.example = example;
 //                    loadNextPack(0, 50);
-                    exampleList = example.getList();
-                    adapter = new WeatherAdapter(exampleList, this);
+                    exampleCoordsPojoList = example.getCoordsPojoList();
+                    adapter = new WeatherAdapter(exampleCoordsPojoList, this);
                     recyclerView.setAdapter(adapter);
-                    if (weatherFragmentListener != null){
-                        weatherFragmentListener.closeProgressDialog();
+                    if (listener != null){
+                        listener.closeProgressDialog();
                     }
                     if (swipeRefreshLayout.isRefreshing()){
                         swipeRefreshLayout.setRefreshing(false);
@@ -113,7 +117,6 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Weather
         setLat();
         setLng();
         callAPI(lat, lng);
-
     }
 
     @Nullable
@@ -149,10 +152,10 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Weather
     }
 
     @Override
-    public void clickElement(List<com.example.user.weatherapp.pojo.coords_pojo.List> lists, int position) {
+    public void clickElement(List<CoordsPojoList> coordsPojoLists, int position) {
         Log.d(TAG, "call clickElement: ");
         Example ex = new Example();
-        ex.setList(lists);
+        ex.setCoordsPojoList(coordsPojoLists);
         String json = new Gson().toJson(ex, Example.class);
         WeatherDescriptionFragment fragment = WeatherDescriptionFragment.newInstance(json, position, MANY_ELEMENTS);
         getFragmentManager().beginTransaction()
@@ -179,7 +182,7 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Weather
 //    public void loadNextPack(int down_limit, int up_limit) {
 //        Log.d(TAG, "call loadNextPack: ");
 //        for (int i = down_limit; i < up_limit; i ++){
-//            exampleList.add(i, example.getList().get(i));
+//            exampleCoordsPojoList.add(i, example.getCoordsPojoList().get(i));
 //        }
 //        if (down_limit != 0)
 //            adapter.notifyDataSetChanged();
@@ -193,23 +196,18 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Weather
     @Override
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(true);
-        weatherFragmentListener.refreshCoords();
+        listener.refreshCoords();
         callAPI(lat, lng);
-
         Log.d(TAG, "after setRefreshing false");
     }
 
-    public interface Listener {
-        void closeProgressDialog();
-        void refreshCoords();
-        void openProgressDialog();
-    }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         Log.d(TAG, "call onAttach()");
         if (context instanceof Listener){
-            weatherFragmentListener = (Listener) context;
+            listener = (Listener) context;
         }else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -220,7 +218,7 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Weather
     public void onDetach() {
         Log.d(TAG, "call onDetach: ");
         super.onDetach();
-        weatherFragmentListener = null;
+        listener = null;
     }
 
     @Override
@@ -261,8 +259,8 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Weather
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(example -> {
-                    if (weatherFragmentListener != null){
-                        weatherFragmentListener.closeProgressDialog();
+                    if (listener != null){
+                        listener.closeProgressDialog();
                     }
                             Log.d(TAG, "onQueryTextSubmit: " + example.getName());
                             adapter = new WeatherAdapter(example, this);
@@ -289,14 +287,14 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Weather
         }
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(false);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-//        Log.d(TAG, "in clickback list size = " + exampleList.size());
-        weatherFragmentListener.openProgressDialog();
+//        Log.d(TAG, "in clickback list size = " + exampleCoordsPojoList.size());
+        listener.openProgressDialog();
         callAPI(lat, lng);
     }
     public void clickBackCallCityAPI(){
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(false);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        weatherFragmentListener.openProgressDialog();
+        listener.openProgressDialog();
         callCityAPI(lastCity);
     }
 

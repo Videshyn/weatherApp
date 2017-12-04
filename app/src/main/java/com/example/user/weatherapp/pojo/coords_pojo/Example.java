@@ -15,9 +15,9 @@ public class Example {
     @SerializedName("count")
     @Expose
     private Integer count;
-    @SerializedName("list")
+    @SerializedName("coordsPojoList")
     @Expose
-    private java.util.List<List> list = null;
+    private java.util.List<CoordsPojoList> coordsPojoList = null;
 
     public String getMessage() {
         return message;
@@ -43,12 +43,12 @@ public class Example {
         this.count = count;
     }
 
-    public java.util.List<List> getList() {
-        return list;
+    public java.util.List<CoordsPojoList> getCoordsPojoList() {
+        return coordsPojoList;
     }
 
-    public void setList(java.util.List<List> list) {
-        this.list = list;
+    public void setCoordsPojoList(java.util.List<CoordsPojoList> coordsPojoList) {
+        this.coordsPojoList = coordsPojoList;
     }
 
 }
