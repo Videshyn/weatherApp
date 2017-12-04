@@ -46,16 +46,10 @@ public class WeatherDescriptionFragment extends Fragment {
     private Toolbar toolbar;
     private ImageView img;
     private TextView temperature, temperatureMax, temperatureMin, pressure, humidity, description, wind;
-//    private double latitude, longitude;
     private String responce;
     private java.util.List<ListItem> weekList = new ArrayList<>();
-    private WeatherDescriptionFragmentListener weatherDescriptionFragmentListener;
     private OpenWeatherMapJSON weatherMapJSON = new OpenWeatherMapJSON();
-
-    public interface WeatherDescriptionFragmentListener{
-        void showProgressDialogInDescription();
-        void closeProgressDialogInDescription();
-    }
+    private CityListFragment.Listener listener;
 
     public static WeatherDescriptionFragment newInstance(String param1, int param2, int checkParam) {
         WeatherDescriptionFragment fragment = new WeatherDescriptionFragment();
@@ -83,7 +77,7 @@ public class WeatherDescriptionFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_weather_description, container, false);
         ViewPager viewPager = view.findViewById(R.id.pager);
         callWeatherWeekAPI(viewPager);
-        Toolbar toolbar = view.findViewById(R.id.toolbar);
+        toolbar = view.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -91,7 +85,7 @@ public class WeatherDescriptionFragment extends Fragment {
         return view;
     }
     private void callWeatherWeekAPI(ViewPager viewPager){
-        weatherDescriptionFragmentListener.showProgressDialogInDescription();
+        listener.openProgressDialog();
         Integer idCity = 0;
         if (checkParam == Const.MANY_ELEMENTS){
             Example example = new Gson().fromJson(json, Example.class);
@@ -112,11 +106,11 @@ public class WeatherDescriptionFragment extends Fragment {
                 weatherMapJSON.setList(weekList);
                 Log.d(TAG, "in rx list size = " + weekList.size());
                 Log.d(TAG, "callWeatherWeekAPI: " + fiveDays.getList().size());
-                weatherDescriptionFragmentListener.closeProgressDialogInDescription();
+                listener.closeProgressDialog();
                 responce = new Gson().toJson(weatherMapJSON, OpenWeatherMapJSON.class);
                 Log.d(TAG, "responce = " + responce);
                 viewPager.setAdapter(new MyPagerAdapter(getChildFragmentManager(), responce));
-
+                toolbar.setTitle(fiveDays.getCity().getName() + "");
 
             });
 
@@ -126,8 +120,8 @@ public class WeatherDescriptionFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         Log.d(TAG, "call onAttach()");
-        if (context instanceof WeatherDescriptionFragmentListener){
-            weatherDescriptionFragmentListener = (WeatherDescriptionFragmentListener) context;
+        if (context instanceof CityListFragment.Listener){
+            listener = (CityListFragment.Listener) context;
         }else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -193,7 +187,7 @@ public class WeatherDescriptionFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        weatherDescriptionFragmentListener = null;
+        listener = null;
     }
 
     @Override

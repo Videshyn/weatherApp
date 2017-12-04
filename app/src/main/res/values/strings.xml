@@ -11,4 +11,15 @@
     <string name="title_network_error">Network error</string>
     <string name="title_progress_dialog">Progress...</string>
     <string name="search">search</string>
+    <string name="temperature_today">Temperature today:</string>
+    <string name="min_temperature">min temperature =</string>
+    <string name="celciy">°C</string>
+    <string name="max_temperature">max temperature =</string>
+    <string name="pressure">pressure =</string>
+    <string name="mbar">mbar</string>
+    <string name="humidty">humidity =</string>
+    <string name="description">description:</string>
+    <string name="wind_city_speed">WindCity speed =</string>
+    <string name="wind_city_null">WindCity speed = 0.0km/h</string>
+    <string name="km_h">km/h</string>
 </resources>

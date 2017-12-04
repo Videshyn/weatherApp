@@ -18,7 +18,7 @@ public class Const {
     public static final String PNG = ".png";
     public static final String ICON_URL = "http://openweathermap.org/img/w/";
 
-    //WeatherFragment
+    //CityListFragment
     public static final  String LAT = "lat";
     public static final  String LNG = "lng";
     public static final int DEFAULT_CNT = 50;

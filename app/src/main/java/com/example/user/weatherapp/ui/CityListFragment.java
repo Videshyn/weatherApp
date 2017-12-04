@@ -3,6 +3,7 @@ package com.example.user.weatherapp.ui;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -45,27 +46,27 @@ import static com.example.user.weatherapp.utils.Const.ONE_ELEMENT;
  * Created by User on 16.10.2017
  */
 
-public class WeatherFragment extends Fragment implements WeatherAdapter.WeatherAdapterListener, SwipeRefreshLayout.OnRefreshListener, SearchView.OnQueryTextListener{
-    private static final String TAG = WeatherFragment.class.getSimpleName();
+public class CityListFragment extends Fragment implements WeatherAdapter.WeatherAdapterListener, SwipeRefreshLayout.OnRefreshListener, SearchView.OnQueryTextListener{
+    private static final String TAG = CityListFragment.class.getSimpleName();
     private double lat;
     private double lng;
     private RecyclerView recyclerView;
     private WeatherAdapter adapter;
-    private WeatherFragmentListener weatherFragmentListener;
+    private Listener weatherFragmentListener;
     private View view;
     private Example example;
     private List<com.example.user.weatherapp.pojo.coords_pojo.List> exampleList = new ArrayList<>();
     private SwipeRefreshLayout swipeRefreshLayout;
     private SearchView searchView;
     private boolean toolBarFlag = false;
-    public static String lastCity = "null";
+    public String lastCity;
 
-    public static WeatherFragment newInstance(double lat, double lng) {
+    public static CityListFragment newInstance(double lat, double lng) {
         Log.d(TAG, "call newInstance:");
         Bundle args = new Bundle();
         args.putDouble(LAT, lat);
         args.putDouble(LNG, lng);
-        WeatherFragment fragment = new WeatherFragment();
+        CityListFragment fragment = new CityListFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -74,6 +75,9 @@ public class WeatherFragment extends Fragment implements WeatherAdapter.WeatherA
             return adapter.getItemCount();
         }else return -1;
     }
+
+
+
     private void setLat(){
         lat = getArguments().getDouble(LAT);
     }
@@ -82,7 +86,6 @@ public class WeatherFragment extends Fragment implements WeatherAdapter.WeatherA
     }
 
     private void callAPI(double latitude, double longitude){
-
         Log.d(TAG, "callAPI: exampleList size = " + exampleList.size());
         WeatherAPI.getClient().create(WeatherAPI.WeatherInterface.class)
                 .getAll(latitude, longitude, DEFAULT_CNT, KEY)
@@ -96,6 +99,9 @@ public class WeatherFragment extends Fragment implements WeatherAdapter.WeatherA
                     recyclerView.setAdapter(adapter);
                     if (weatherFragmentListener != null){
                         weatherFragmentListener.closeProgressDialog();
+                    }
+                    if (swipeRefreshLayout.isRefreshing()){
+                        swipeRefreshLayout.setRefreshing(false);
                     }
                 });
     }
@@ -154,7 +160,6 @@ public class WeatherFragment extends Fragment implements WeatherAdapter.WeatherA
                 .addToBackStack(null)
                 .commit();
         setHasOptionsMenu(false);
-        lastCity = "null";
     }
 
     @Override
@@ -180,31 +185,31 @@ public class WeatherFragment extends Fragment implements WeatherAdapter.WeatherA
 //            adapter.notifyDataSetChanged();
 //    }
 
+    public void onLocationUpdate(Location location){
+        lat = location.getLatitude();
+        lng = location.getLongitude();
+    }
+
     @Override
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(true);
-        ArrayList<Double> coords = weatherFragmentListener.refreshCoords();
-        if (coords.size() == 2 && coords != null){
-            lat = coords.get(0);
-            lng = coords.get(1);
-            callAPI(lat, lng);
-        }else
-            callAPI(lat, lng);
-        swipeRefreshLayout.setRefreshing(false);
+        weatherFragmentListener.refreshCoords();
+        callAPI(lat, lng);
+
         Log.d(TAG, "after setRefreshing false");
     }
 
-    public interface WeatherFragmentListener{
+    public interface Listener {
         void closeProgressDialog();
-        ArrayList<Double> refreshCoords();
+        void refreshCoords();
         void openProgressDialog();
     }
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         Log.d(TAG, "call onAttach()");
-        if (context instanceof WeatherFragmentListener){
-            weatherFragmentListener = (WeatherFragmentListener) context;
+        if (context instanceof Listener){
+            weatherFragmentListener = (Listener) context;
         }else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -225,7 +230,6 @@ public class WeatherFragment extends Fragment implements WeatherAdapter.WeatherA
         Log.d(TAG, "onCreateOptionsMenu: " + (searchItem == null));
         searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setOnQueryTextListener(this);
-        searchView.setBackgroundTintMode(PorterDuff.Mode.LIGHTEN);
         if (toolBarFlag){
             menu.clear();
         }

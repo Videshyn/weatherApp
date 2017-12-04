@@ -44,6 +44,8 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
 
+    compile 'net.danlew:android.joda:2.9.9.1'
+
     compile 'com.android.support:support-v4:25.2.0'
 
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {

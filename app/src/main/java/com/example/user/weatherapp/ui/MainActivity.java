@@ -1,41 +1,28 @@
 package com.example.user.weatherapp.ui;
 
 import android.app.ProgressDialog;
-import android.location.Location;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.example.user.weatherapp.R;
-import com.example.user.weatherapp.pojo.week_pojo.WeekWeather;
-import com.example.user.weatherapp.retrofit.WeatherAPI;
-import com.example.user.weatherapp.utils.Const;
 import com.example.user.weatherapp.utils.Utils;
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 
-import java.util.ArrayList;
+import net.danlew.android.joda.JodaTimeAndroid;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
-public class MainActivity extends AppCompatActivity implements WeatherFragment.WeatherFragmentListener, WeatherDescriptionFragment.WeatherDescriptionFragmentListener{
+public class MainActivity extends AppCompatActivity implements CityListFragment.Listener{
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private double lat = -100;
-    private double lng = -100;
     private ProgressDialog progressDialog;
-    private WeatherFragment fragment;
+    private CityListFragment fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        JodaTimeAndroid.init(this);
 
 //        WeatherAPI.WeekResponce api = WeatherAPI.getClient().create(WeatherAPI.WeekResponce.class);
 //        Call<WeekWeather> call = api.getWeek(706483, Const.KEY);
@@ -66,24 +53,19 @@ public class MainActivity extends AppCompatActivity implements WeatherFragment.W
     }
 
     private void startWeatherFragment(){
-
         showProgressDialog();
 
-        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        fusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
+        LocationServices
+                .getFusedLocationProviderClient(this)
+                .getLastLocation()
+                .addOnSuccessListener(this, location -> {
                 if (location != null){
-                    lat = location.getLatitude();
-                    lng = location.getLongitude();
-                    if (lat >= 0.0 && lng >= 0.0){
-                        fragment = WeatherFragment.newInstance(lat, lng);
-                        android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                        ft.replace(R.id.container, fragment);
-                        ft.commit();
-                    }
+                    fragment = CityListFragment.newInstance(location.getLatitude(), location.getLongitude());
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.container, fragment)
+                            .commit();
                 }
-            }
         });
     }
 
@@ -101,22 +83,35 @@ public class MainActivity extends AppCompatActivity implements WeatherFragment.W
         }).show();
     }
 
-    @Override
-    public void closeProgressDialog() {
-        Log.d(TAG, "closeProgressDialog: ");
-        progressDialog.dismiss();
-    }
+
 
     @Override
-    public ArrayList<Double> refreshCoords() {
-        ArrayList<Double> coords = new ArrayList<>();
-        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        fusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, location -> {
-            coords.add(location.getLatitude());
-            coords.add(location.getLongitude());
-        });
-        return coords;
+    public void refreshCoords() {
+        LocationServices
+                .getFusedLocationProviderClient(this)
+                .getLastLocation()
+                .addOnSuccessListener(this, location -> fragment.onLocationUpdate(location));
     }
+
+
+    @Override
+    public void onBackPressed() {
+        if (fragment != null){
+            if (fragment.lastCity != null){
+                if (getSupportFragmentManager().getBackStackEntryCount() == 0){
+                    if (fragment.getElementsCount() > 1)super.onBackPressed();
+                    fragment.clickBackCallAPI();
+                }else if(getSupportFragmentManager().getBackStackEntryCount() != 0){
+                    if (fragment.getElementsCount() > 1)super.onBackPressed();
+                    else {
+                        getSupportFragmentManager().popBackStack();
+                        fragment.clickBackCallCityAPI();
+                    }
+                }else super.onBackPressed();
+            }else super.onBackPressed();
+        }else super.onBackPressed();
+    }
+
 
     @Override
     public void openProgressDialog() {
@@ -124,28 +119,9 @@ public class MainActivity extends AppCompatActivity implements WeatherFragment.W
     }
 
     @Override
-    public void onBackPressed() {
-        if (fragment != null){
-            if (getSupportFragmentManager().getBackStackEntryCount() == 0 && !"null".equals(WeatherFragment.lastCity)){
-                fragment.clickBackCallAPI();
-            }else if (!"null".equals(WeatherFragment.lastCity) && getSupportFragmentManager().getBackStackEntryCount() != 0){
-                getSupportFragmentManager().popBackStack();
-                fragment.clickBackCallCityAPI();
-            }else {
-                super.onBackPressed();
-            }
-        }else
-            super.onBackPressed();
-
+    public void closeProgressDialog() {
+        if (progressDialog != null)
+            progressDialog.dismiss();
     }
 
-    @Override
-    public void showProgressDialogInDescription() {
-        showProgressDialog();
-    }
-
-    @Override
-    public void closeProgressDialogInDescription() {
-        progressDialog.dismiss();
-    }
 }

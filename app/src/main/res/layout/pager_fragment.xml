@@ -22,14 +22,16 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:hint="Temperature now = "
-    android:textColor="@color/black"
-    android:textSize="18sp"
-    android:id="@+id/temperature_full_fragment"
-    android:layout_margin="10dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/description_full_fragment"
+            android:layout_marginTop="15dp"
+            android:textColor="@color/black"
+            android:hint="Description"
+            android:textSize="18sp"
+            android:layout_gravity="center_horizontal"/>
+
 
     <TextView
     android:layout_width="wrap_content"
@@ -96,13 +98,15 @@
     </LinearLayout>
 
     <TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:id="@+id/description_full_fragment"
-    android:layout_marginTop="15dp"
-    android:textColor="@color/black"
-    android:hint="Description"
-    android:textSize="18sp"
-    android:layout_gravity="center_horizontal"/>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Temperature now = "
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:id="@+id/temperature_full_fragment"
+        android:layout_margin="10dp"
+        android:layout_gravity="center"/>
+
+
 
 </LinearLayout>
