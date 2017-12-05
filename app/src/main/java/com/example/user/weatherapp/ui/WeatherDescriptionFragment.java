@@ -11,6 +11,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -104,12 +106,15 @@ public class WeatherDescriptionFragment extends Fragment {
                 .subscribe(fiveDays -> {
                     weekList = fiveDays.getList();
                     weatherMapJSON.setList(weekList);
+
+                    String cityName = fiveDays.getCity().getName();
+
                     Log.d(TAG, "in rx list size = " + weekList.size());
                     Log.d(TAG, "callWeatherWeekAPI: " + fiveDays.getList().size());
                     listener.closeProgressDialog();
                     responce = new Gson().toJson(weatherMapJSON, OpenWeatherMapJSON.class);
                     Log.d(TAG, "responce = " + responce);
-                    viewPager.setAdapter(new MyPagerAdapter(getChildFragmentManager(), responce));
+                    viewPager.setAdapter(new MyPagerAdapter(getChildFragmentManager(), responce, cityName));
                     toolbar.setTitle(fiveDays.getCity().getName() + "");
             });
 
@@ -197,12 +202,23 @@ public class WeatherDescriptionFragment extends Fragment {
                 getFragmentManager().popBackStack();
                 Log.d(TAG, "size = " + getFragmentManager().getBackStackEntryCount());
                 return true;
+
+
         }
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu, menu);
+        MenuItem addItem = menu.findItem(R.id.add_to_history);
+        addItem.setVisible(false);
+        MenuItem history = menu.findItem(R.id.my_history);
+        history.setVisible(true);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
 
-//    private void initUI(View view){
+    //    private void initUI(View view){
 //        toolbar = view.findViewById(R.id.toolbar);
 //        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 //        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -221,16 +237,17 @@ public class WeatherDescriptionFragment extends Fragment {
 
     class MyPagerAdapter extends FragmentStatePagerAdapter {
 
-        private String str;
-        public MyPagerAdapter(FragmentManager fm, String response) {
+        private String str, city;
+        public MyPagerAdapter(FragmentManager fm, String response, String cityName) {
             super(fm);
             str = response;
+            city = cityName;
         }
 
         @Override
         public Fragment getItem(int position) {
             Log.d(TAG, "in adapter response = " + str);
-            return WeatherPagerFragment.newInstance(str, position);
+            return WeatherPagerFragment.newInstance(str, position, city);
         }
 
         @Override

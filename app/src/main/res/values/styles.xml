@@ -23,4 +23,8 @@
 
     </style>
 
+    <style name="MyThemeWithoutActionBar.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="MyThemeWithoutActionBar.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
 </resources>

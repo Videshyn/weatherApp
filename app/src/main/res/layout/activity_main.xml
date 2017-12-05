@@ -6,8 +6,14 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/container"
         tools:context="com.example.user.weatherapp.ui.MainActivity">
+
+    <FrameLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </FrameLayout>
 
     <!--<android.support.v4.view.ViewPager-->
         <!--android:id="@+id/pager_view"-->

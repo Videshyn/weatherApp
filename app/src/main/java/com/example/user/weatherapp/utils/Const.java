@@ -30,4 +30,12 @@ public class Const {
     public static final String RESPONSE = "RESPONSE";
     public static final String PAGER_POSITION = "PAGER_POSITION";
 
+    //DBHelper
+    public static final String DB_NAME = "AddedWeather";
+    public static final int DB_VERSION = 2;
+
+    //ItemFragment
+    public static final String JSON_WITH_INFO = "JSON_WITH_INFO";
+    public static final String JSON_TYPE = "JSON_TYPE";
+
 }

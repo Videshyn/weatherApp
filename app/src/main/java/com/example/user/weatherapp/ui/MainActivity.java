@@ -6,17 +6,22 @@ import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.user.weatherapp.R;
+import com.example.user.weatherapp.pojo.coords_pojo.List;
 import com.example.user.weatherapp.utils.Utils;
 import com.google.android.gms.location.LocationServices;
 
@@ -39,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
         Log.d(TAG, "onCreate: start");
         latET = (EditText) findViewById(R.id.latET);
         lonET = (EditText) findViewById(R.id.lonET);
+
 //        WeatherAPI.WeekResponce api = WeatherAPI.getClient().create(WeatherAPI.WeekResponce.class);
 //        Call<WeekWeather> call = api.getWeek(706483, Const.KEY);
 //
@@ -95,28 +101,27 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
     }
 
     private void setLocation(){
-        View view = View.inflate(getBaseContext(), R.layout.dialog_location, null);
-        EditText latET = view.findViewById(R.id.latET);
-        EditText lonET = view.findViewById(R.id.lonET);
+        final View view = View.inflate(getBaseContext(), R.layout.dialog_location, null);
+        final EditText latET = view.findViewById(R.id.latET);
+        final EditText lonET = view.findViewById(R.id.lonET);
         new AlertDialog.Builder(this)
-                .setTitle("Location Error")
-                .setMessage("Enter your coords")
+                .setTitle(R.string.location_erro)
+                .setMessage(R.string.enter_coords)
                 .setView(view)
-                .setPositiveButton("ok", (dialog, which) -> {
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                     try {
                         double mLat = Double.parseDouble(latET.getText().toString());
                         double mLon = Double.parseDouble(lonET.getText().toString());
                         fragment = CityListFragment.newInstance(mLat, mLon);
-                        dialog.dismiss();
+                        getSupportFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.container, fragment)
+                                .commit();
+
                     }catch (NumberFormatException ex){
                         Toast.makeText(getBaseContext(), "NumberFormatException ", Toast.LENGTH_LONG).show();
+                        setLocation();
                     }
-
-                    getSupportFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.container, fragment)
-                            .commit();
-
                 })
                 .show();
 

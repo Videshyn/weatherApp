@@ -10,4 +10,17 @@
         app:actionViewClass="android.support.v7.widget.SearchView">
     </item>
 
+    <item
+        android:id="@+id/my_history"
+        android:title="@string/history"
+        android:icon="@drawable/history"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/add_to_history"
+        android:title="@string/add"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/plus_info"
+        />
+
 </menu>

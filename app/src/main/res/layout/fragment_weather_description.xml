@@ -5,7 +5,8 @@
     tools:context="com.example.user.weatherapp.ui.WeatherDescriptionFragment"
     android:orientation="vertical"
     android:clickable="true"
-    android:background="#fff">
+    android:background="#fff"
+    android:id="@+id/ll">
 
     <android.support.v7.widget.Toolbar
     android:id="@+id/toolbar"

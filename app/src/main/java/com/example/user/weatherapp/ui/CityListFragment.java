@@ -231,7 +231,10 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu, menu);
         MenuItem searchItem = menu.findItem(R.id.search_item_menu);
-        Log.d(TAG, "onCreateOptionsMenu: " + (searchItem == null));
+        MenuItem addItem = menu.findItem(R.id.add_to_history);
+        addItem.setVisible(true);
+        MenuItem history = menu.findItem(R.id.my_history);
+        history.setVisible(true);
         searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setOnQueryTextListener(this);
         if (toolBarFlag){
@@ -248,9 +251,23 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
                 callAPI(lat, lng);
                 return true;
+            case R.id.my_history:
+                try{
+                    Log.d(TAG, "onOptionsItemSelected: ");
+                    ItemFragment itemFragment = ItemFragment.newInstance();
+                    getFragmentManager().beginTransaction()
+                            .add(R.id.container, itemFragment)
+                            .addToBackStack(null)
+                            .commit();
+                }catch (Exception ex){
+                    Log.d(TAG, "ex = " + ex.getMessage().toString());
+                }
+
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
+
 
     @Override
     public boolean onQueryTextSubmit(String query) {

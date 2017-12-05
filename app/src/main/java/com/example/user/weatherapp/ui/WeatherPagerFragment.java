@@ -1,5 +1,6 @@
 package com.example.user.weatherapp.ui;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -17,12 +18,15 @@ import com.bumptech.glide.Glide;
 import com.example.user.weatherapp.R;
 import com.example.user.weatherapp.pojo.pojo_robot.OpenWeatherMapJSON;
 import com.example.user.weatherapp.utils.Const;
+import com.example.user.weatherapp.utils.DBHelper;
 import com.google.gson.Gson;
 
 import org.joda.time.DateTime;
 
 import java.math.BigDecimal;
 
+import static com.example.user.weatherapp.utils.Const.DB_NAME;
+import static com.example.user.weatherapp.utils.Const.DB_VERSION;
 import static com.example.user.weatherapp.utils.Const.PAGER_POSITION;
 import static com.example.user.weatherapp.utils.Const.PNG;
 import static com.example.user.weatherapp.utils.Const.RESPONSE;
@@ -34,18 +38,21 @@ import static com.example.user.weatherapp.utils.Const.RESPONSE;
 public class WeatherPagerFragment extends Fragment {
 
     private static final String TAG = WeatherPagerFragment.class.getSimpleName();
+    private static final String CITY_NAME = "CITY_NAME";
+    private SQLiteDatabase database;
+    private DBHelper dbHelper;
     private int pagerPosition;
-    private String response;
+    private String response, cityName;
     private ImageView img;
     private OpenWeatherMapJSON weatherMapJSON;
     private TextView temperature, temperatureMax, temperatureMin, pressure, humidity, description, wind;
 
-
-    public static WeatherPagerFragment newInstance(String responce, int pagerPosition) {
+    public static WeatherPagerFragment newInstance(String responce, int pagerPosition, String cityName) {
         Log.d(TAG, "call newInstance:");
         Bundle args = new Bundle();
         args.putString(RESPONSE, responce);
         args.putInt(PAGER_POSITION, pagerPosition);
+        args.putString(CITY_NAME, cityName);
         WeatherPagerFragment fragment = new WeatherPagerFragment();
         fragment.setArguments(args);
         return fragment;
@@ -60,12 +67,14 @@ public class WeatherPagerFragment extends Fragment {
         humidity = view.findViewById(R.id.humidity_full_fragment);
         description = view.findViewById(R.id.description_full_fragment);
         wind = view.findViewById(R.id.wind_full_fragment);
+        dbHelper = new DBHelper(getContext(), DB_NAME, null, DB_VERSION);
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         pagerPosition = getArguments().getInt(PAGER_POSITION);
         response = getArguments().getString(RESPONSE);
+        cityName = getArguments().getString(CITY_NAME);
         Log.d(TAG, "response = " + response);
         weatherMapJSON = new Gson().fromJson(response, OpenWeatherMapJSON.class);
         super.onCreate(savedInstanceState);
@@ -129,7 +138,7 @@ public class WeatherPagerFragment extends Fragment {
         pressure.setText(getString(R.string.pressure) + weatherMapJSON.getList().get(plusDays).getMain().getPressure() + getString(R.string.mbar));
         humidity.setText(getString(R.string.humidty) + weatherMapJSON.getList().get(plusDays).getMain().getHumidity() + "%");
         description.setText(getString(R.string.description) + weatherMapJSON.getList().get(plusDays).getWeather().get(0).getDescription());
-        if (weatherMapJSON.getList().get(0).getWind() != null){
+        if (weatherMapJSON.getList().get(plusDays).getWind() != null){
             wind.setText(getString(R.string.wind_city_speed)  + weatherMapJSON.getList().get(plusDays).getWind().getSpeed() + getString(R.string.km_h));
         }else {
             wind.setText(R.string.wind_city_null);
@@ -137,12 +146,27 @@ public class WeatherPagerFragment extends Fragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Log.d(TAG, "onOptionsItemSelected: ");
+        switch (item.getItemId()){
+            case android.R.id.home:
+                getFragmentManager().popBackStack();
+                Log.d(TAG, "size = " + getFragmentManager().getBackStackEntryCount());
+                return true;
+            case R.id.add_to_history:
+                dbHelper.saveHistory(response, pagerPosition, cityName);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu, menu);
+        MenuItem addItem = menu.findItem(R.id.add_to_history);
+        addItem.setVisible(true);
+        MenuItem history = menu.findItem(R.id.my_history);
+        history.setVisible(false);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 }

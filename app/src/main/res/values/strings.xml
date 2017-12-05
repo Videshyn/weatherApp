@@ -22,4 +22,14 @@
     <string name="wind_city_speed">WindCity speed =</string>
     <string name="wind_city_null">WindCity speed = 0.0km/h</string>
     <string name="km_h">km/h</string>
+    <string name="location_erro">Location Error</string>
+    <string name="enter_coords">Enter your coords</string>
+    <string name="title_activity_main2">Main2Activity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="history">history</string>
+    <string name="add">add</string>
 </resources>
