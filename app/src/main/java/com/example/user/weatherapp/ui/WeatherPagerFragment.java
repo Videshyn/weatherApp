@@ -16,6 +16,8 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.user.weatherapp.R;
+import com.example.user.weatherapp.pojo.coords_pojo.MainCityModel;
+import com.example.user.weatherapp.pojo.coords_pojo.WrapperMainCityModel;
 import com.example.user.weatherapp.pojo.pojo_robot.OpenWeatherMapJSON;
 import com.example.user.weatherapp.utils.Const;
 import com.example.user.weatherapp.utils.DBHelper;
@@ -39,12 +41,11 @@ public class WeatherPagerFragment extends Fragment {
 
     private static final String TAG = WeatherPagerFragment.class.getSimpleName();
     private static final String CITY_NAME = "CITY_NAME";
-    private SQLiteDatabase database;
-    private DBHelper dbHelper;
     private int pagerPosition;
     private String response, cityName;
     private ImageView img;
     private OpenWeatherMapJSON weatherMapJSON;
+    private WrapperMainCityModel wrapperMainCityModel;
     private TextView temperature, temperatureMax, temperatureMin, pressure, humidity, description, wind;
 
     public static WeatherPagerFragment newInstance(String responce, int pagerPosition, String cityName) {
@@ -67,7 +68,6 @@ public class WeatherPagerFragment extends Fragment {
         humidity = view.findViewById(R.id.humidity_full_fragment);
         description = view.findViewById(R.id.description_full_fragment);
         wind = view.findViewById(R.id.wind_full_fragment);
-        dbHelper = new DBHelper(getContext(), DB_NAME, null, DB_VERSION);
     }
 
     @Override
@@ -76,7 +76,12 @@ public class WeatherPagerFragment extends Fragment {
         response = getArguments().getString(RESPONSE);
         cityName = getArguments().getString(CITY_NAME);
         Log.d(TAG, "response = " + response);
-        weatherMapJSON = new Gson().fromJson(response, OpenWeatherMapJSON.class);
+        if (cityName == null){
+            wrapperMainCityModel = new Gson().fromJson(response, WrapperMainCityModel.class);
+        }else {
+            weatherMapJSON = new Gson().fromJson(response, OpenWeatherMapJSON.class);
+        }
+
         super.onCreate(savedInstanceState);
     }
 
@@ -85,39 +90,68 @@ public class WeatherPagerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.pager_fragment, container, false);
         initUI(view);
+
+        if (wrapperMainCityModel != null){
+            fillPagerFromDB();
+        }else {
+            fillPagerFromAPI();
+        }
+
+        setHasOptionsMenu(true);
+        return view;
+    }
+
+    private void fillPagerFromDB() {
+        MainCityModel model = wrapperMainCityModel.getModelList().get(pagerPosition);
+        Glide.with(img.getContext())
+                .load(wrapperMainCityModel
+                        .getModelList()
+                        .get(pagerPosition)
+                        .getIconURLDB())
+                .into(img);
+
+        temperature.setText(getString(R.string.temperature_today) + " = " + model.getTmpDb());
+        //in this case temperature min = date
+        temperatureMin.setText(getString(R.string.Date) + model.getDateDb());
+        //in this case temperature max = windSpeed
+        temperatureMax.setText(getString(R.string.wind_speed) + model.getWindModel());
+        pressure.setText(getString(R.string.pressure) + model.getPressureDb());
+        humidity.setText(getString(R.string.humidty) + model.getHumidityDb());
+        description.setText(getString(R.string.description) + " " + model.getDescriptionDb());
+    }
+
+    private void fillPagerFromAPI() {
         int plusDays = 0;
         switch (pagerPosition){
             case 0:
-                fillPagerFragment(plusDays);
+                fillViews(plusDays);
                 break;
             case 1:
                 plusDays = 1;
-                fillPagerFragment(plusDays);
+                fillViews(plusDays);
                 Log.d(TAG, "date8 = " + weatherMapJSON.getList().get(8).getDtTxt());
                 break;
             case 2:
                 plusDays = 2;
                 Log.d(TAG, "date16 = " + weatherMapJSON.getList().get(16).getDtTxt());
-                fillPagerFragment(plusDays);
+                fillViews(plusDays);
                 break;
             case 3:
                 plusDays = 3;
                 Log.d(TAG, "date24 = " + weatherMapJSON.getList().get(24).getDtTxt());
-                fillPagerFragment(plusDays);
+                fillViews(plusDays);
                 break;
             case 4:
                 plusDays = 4;
                 Log.d(TAG, "date32 = " + weatherMapJSON.getList().get(32).getDtTxt());
-                fillPagerFragment(plusDays);
+                fillViews(plusDays);
                 break;
             default:
                 break;
         }
-        setHasOptionsMenu(true);
-        return view;
     }
 
-    private void fillPagerFragment(int plusDays){
+    private void fillViews(int plusDays){
         String fullTmp = "";
         String jodaDay = new DateTime().plusDays(plusDays).toLocalDate().toString();
         for (int i = 0, n = weatherMapJSON.getList().size(); i < n; i ++){
@@ -145,28 +179,31 @@ public class WeatherPagerFragment extends Fragment {
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Log.d(TAG, "onOptionsItemSelected: ");
-        switch (item.getItemId()){
-            case android.R.id.home:
-                getFragmentManager().popBackStack();
-                Log.d(TAG, "size = " + getFragmentManager().getBackStackEntryCount());
-                return true;
-            case R.id.add_to_history:
-                dbHelper.saveHistory(response, pagerPosition, cityName);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu, menu);
-        MenuItem addItem = menu.findItem(R.id.add_to_history);
-        addItem.setVisible(true);
-        MenuItem history = menu.findItem(R.id.my_history);
-        history.setVisible(false);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch (item.getItemId()){
+//            case android.R.id.home:
+//                getFragmentManager().popBackStack();
+//                break;
+//            case R.id.add_to_history:
+//                dbHelper.saveHistory(response, pagerPosition, cityName);
+//                break;
+//        }
+//        return true;
+//    }
+//
+//    @Override
+//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+//        inflater.inflate(R.menu.menu, menu);
+//        if (wrapperMainCityModel != null){
+//            menu.clear();
+//        }else {
+//            MenuItem addItem = menu.findItem(R.id.add_to_history);
+//            addItem.setVisible(true);
+//            MenuItem history = menu.findItem(R.id.my_history);
+//            history.setVisible(false);
+//        }
+//
+//        super.onCreateOptionsMenu(menu, inflater);
+//    }
 }

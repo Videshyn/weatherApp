@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.user.weatherapp.pojo.HistoryModel;
+import com.example.user.weatherapp.pojo.coords_pojo.MainCityModel;
 import com.example.user.weatherapp.pojo.pojo_robot.OpenWeatherMapJSON;
 import com.google.gson.Gson;
 
@@ -27,7 +27,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private static final String TAG = DBHelper.class.getSimpleName();
     private final String CREATE_TABLE = "create table WEATHER (id integer primary key autoincrement, " +
-            "city_name text, data text, icon_url text, tmp text, wind text, pressure text, humidity text, description text);";
+            "city_name text, data text, icon_url text, tmp text, wind_speed text, pressure text, humidity text, description text);";
     private final String DROP_TABLE = "DROP TABLE IF EXISTS WEATHER";
     private Context context;
 
@@ -63,9 +63,9 @@ public class DBHelper extends SQLiteOpenHelper {
             cv.put("tmp", new BigDecimal(weatherMapJSON.getList().get(pagerPosition * 8).getMain().getTemp() - 273.15)
                     .setScale(2, BigDecimal.ROUND_UP).doubleValue() + "");
             if (weatherMapJSON.getList().get(pagerPosition * 8).getWind() != null){
-                cv.put("wind", weatherMapJSON.getList().get(pagerPosition * 8).getWind().toString());
+                cv.put("wind_speed", weatherMapJSON.getList().get(pagerPosition * 8).getWind().getSpeed());
             }else
-                cv.put("wind", "null");
+                cv.put("wind_speed", "null");
             cv.put("pressure", weatherMapJSON.getList().get(pagerPosition * 8).getMain().getPressure());
             cv.put("humidity", weatherMapJSON.getList().get(pagerPosition * 8).getMain().getHumidity());
             cv.put("description", weatherMapJSON.getList().get(pagerPosition * 8).getWeather().get(0).getDescription());
@@ -75,12 +75,13 @@ public class DBHelper extends SQLiteOpenHelper {
         }else {
             Log.d(TAG, "weatherMapJson == null");
         }
+        Toast.makeText(context, "Added!", Toast.LENGTH_LONG).show();
         close();
         database.close();
     }
 
-    public List<HistoryModel> readHistory(){
-        List<HistoryModel> modelList = new ArrayList<>();
+    public List<MainCityModel> readHistory(){
+        List<MainCityModel> modelList = new ArrayList<>();
         SQLiteDatabase database = getWritableDatabase();
         Cursor cursor = database.query("WEATHER", null, null, null, null, null, null);
         if (cursor.moveToFirst()){
@@ -89,21 +90,22 @@ public class DBHelper extends SQLiteOpenHelper {
             int dataColumnIndex = cursor.getColumnIndex("data");
             int iconUrlColumnIndex = cursor.getColumnIndex("icon_url");
             int tmpColumnNumber = cursor.getColumnIndex("tmp");
-            int windColumnIndex = cursor.getColumnIndex("wind");
+            int windColumnIndex = cursor.getColumnIndex("wind_speed");
             int pressureColumnIndex = cursor.getColumnIndex("pressure");
             int humidityColumnIndex = cursor.getColumnIndex("humidity");
             int descriptionColumnIndex = cursor.getColumnIndex("description");
             do {
-                modelList.add(new HistoryModel(
-                        cursor.getInt(idColumnIndex),
-                        cursor.getString(cityNameColumnIndex),
-                        cursor.getString(dataColumnIndex),
-                        cursor.getString(iconUrlColumnIndex),
+                modelList.add(new MainCityModel(
                         cursor.getString(tmpColumnNumber),
-                        cursor.getString(windColumnIndex),
                         cursor.getString(pressureColumnIndex),
                         cursor.getString(humidityColumnIndex),
-                        cursor.getString(descriptionColumnIndex)));
+                        cursor.getString(windColumnIndex),
+                        cursor.getInt(idColumnIndex),
+                        cursor.getString(dataColumnIndex),
+                        cursor.getString(descriptionColumnIndex),
+                        cursor.getString(cityNameColumnIndex),
+                        cursor.getString(iconUrlColumnIndex)
+                ));
             }while (cursor.moveToNext());
         }else {
             Toast.makeText(context, "MainModelList is empty", Toast.LENGTH_LONG).show();

@@ -197,7 +197,10 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
                         getSupportFragmentManager().popBackStack();
                         fragment.clickBackCallCityAPI();
                     }
-                }else super.onBackPressed();
+                }else {
+                    fragment.setHasOptionsMenu(true);
+                    super.onBackPressed();
+                }
             }else{
                 fragment.setHasOptionsMenu(true);
                 super.onBackPressed();

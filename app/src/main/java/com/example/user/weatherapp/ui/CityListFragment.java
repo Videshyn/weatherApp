@@ -125,7 +125,7 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
     @Override
     public void clickElement(MainCityModel exampleCity, int position) {
         String json = new Gson().toJson(exampleCity, MainCityModel.class);
-        WeatherDescriptionFragment fragment = WeatherDescriptionFragment.newInstance(json, position);
+        WeatherDescriptionFragment fragment = WeatherDescriptionFragment.newInstance(json, position, 0);
         getFragmentManager()
                 .beginTransaction()
                 .add(R.id.container, fragment)

@@ -15,10 +15,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.user.weatherapp.R;
-import com.example.user.weatherapp.pojo.HistoryModel;
+import com.example.user.weatherapp.pojo.coords_pojo.MainCityModel;
+import com.example.user.weatherapp.pojo.coords_pojo.WrapperMainCityModel;
 import com.google.gson.Gson;
 
 import java.util.List;
+
+import static com.example.user.weatherapp.utils.Const.DB_CHECK;
 
 public class ItemFragment extends Fragment implements DBAdapter.Listener{
 
@@ -52,13 +55,16 @@ public class ItemFragment extends Fragment implements DBAdapter.Listener{
 
 
     @Override
-    public void clickElement(HistoryModel historyModel) {
-        DBWeatherDescription fragment = DBWeatherDescription.newInstance(new Gson().toJson(historyModel, HistoryModel.class));
+    public void clickElement(List<MainCityModel> historyModel, int currentPosition) {
+        WrapperMainCityModel cityModel = new WrapperMainCityModel();
+        cityModel.setModelList(historyModel);
+        WeatherDescriptionFragment fragment = WeatherDescriptionFragment.newInstance(new Gson().toJson(cityModel, WrapperMainCityModel.class), DB_CHECK, currentPosition);
         getFragmentManager()
                 .beginTransaction()
                 .add(R.id.container, fragment)
                 .addToBackStack(null)
                 .commit();
+        setHasOptionsMenu(false);
     }
 
     @Override
@@ -71,9 +77,13 @@ public class ItemFragment extends Fragment implements DBAdapter.Listener{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:
-                getFragmentManager().popBackStack();
+                if (getFragmentManager().getBackStackEntryCount() == 0){
+                    getActivity().onBackPressed();
+                }else {
+                    getFragmentManager().popBackStack();
+                }
                 break;
         }
-        return super.onOptionsItemSelected(item);
+        return true;
     }
 }

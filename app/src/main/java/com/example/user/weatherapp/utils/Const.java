@@ -32,10 +32,13 @@ public class Const {
 
     //DBHelper
     public static final String DB_NAME = "AddedWeather";
-    public static final int DB_VERSION = 2;
+    public static final int DB_VERSION = 3;
 
     //ItemFragment
     public static final String JSON_WITH_INFO = "JSON_WITH_INFO";
     public static final String JSON_TYPE = "JSON_TYPE";
+
+    public static final int DB_CHECK = -666;
+    public static final String CURRENT_POSITION = "CURRENT_POSITION";
 
 }

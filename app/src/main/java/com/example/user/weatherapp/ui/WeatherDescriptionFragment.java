@@ -22,10 +22,12 @@ import android.widget.TextView;
 import com.example.user.weatherapp.R;
 import com.example.user.weatherapp.pojo.coords_pojo.MainCityModel;
 import com.example.user.weatherapp.pojo.coords_pojo.MainModelList;
+import com.example.user.weatherapp.pojo.coords_pojo.WrapperMainCityModel;
 import com.example.user.weatherapp.pojo.pojo_robot.ListItem;
 import com.example.user.weatherapp.pojo.pojo_robot.OpenWeatherMapJSON;
 import com.example.user.weatherapp.retrofit.WeatherAPI;
 import com.example.user.weatherapp.utils.Const;
+import com.example.user.weatherapp.utils.DBHelper;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -33,6 +35,10 @@ import java.util.ArrayList;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
+import static com.example.user.weatherapp.utils.Const.CURRENT_POSITION;
+import static com.example.user.weatherapp.utils.Const.DB_CHECK;
+import static com.example.user.weatherapp.utils.Const.DB_NAME;
+import static com.example.user.weatherapp.utils.Const.DB_VERSION;
 import static com.example.user.weatherapp.utils.Const.JSON;
 import static com.example.user.weatherapp.utils.Const.POSITION;
 
@@ -40,7 +46,7 @@ public class WeatherDescriptionFragment extends Fragment {
 
 
     private String json;
-    private int position;
+    private int position, currentPosition;
     private static final String TAG = WeatherDescriptionFragment.class.getSimpleName();
     private Toolbar toolbar;
     private ImageView img;
@@ -49,12 +55,15 @@ public class WeatherDescriptionFragment extends Fragment {
     private java.util.List<ListItem> weekList = new ArrayList<>();
     private OpenWeatherMapJSON weatherMapJSON = new OpenWeatherMapJSON();
     private CityListFragment.Listener listener;
+    private Listener dbSaveListener;
 
-    public static WeatherDescriptionFragment newInstance(String param1, int param2) {
+
+    public static WeatherDescriptionFragment newInstance(String json, int position, int currentPosition) {
         WeatherDescriptionFragment fragment = new WeatherDescriptionFragment();
         Bundle args = new Bundle();
-        args.putString(JSON, param1);
-        args.putInt(POSITION, param2);
+        args.putString(JSON, json);
+        args.putInt(POSITION, position);
+        args.putInt(CURRENT_POSITION, currentPosition);
         fragment.setArguments(args);
         return fragment;
     }
@@ -65,6 +74,7 @@ public class WeatherDescriptionFragment extends Fragment {
         if (getArguments() != null) {
             json = getArguments().getString(JSON);
             position = getArguments().getInt(POSITION);
+            currentPosition = getArguments().getInt(CURRENT_POSITION);
         }
     }
 
@@ -84,27 +94,37 @@ public class WeatherDescriptionFragment extends Fragment {
     private void callWeatherWeekAPI(ViewPager viewPager){
         listener.openProgressDialog();
         Integer idCity = 0;
-        MainCityModel citiesWeatherModel = new Gson().fromJson(json, MainCityModel.class);
-        java.util.List<MainModelList> weatherList = citiesWeatherModel.getList();
-        if (citiesWeatherModel.getCount() == null){
-            idCity = citiesWeatherModel.getId();
+        if (position == DB_CHECK){
+            viewPager.setAdapter(new MyPagerAdapter(getChildFragmentManager(), json, null));
+            viewPager.setCurrentItem(currentPosition);
+            listener.closeProgressDialog();
         }else {
-            idCity = weatherList.get(position).getId();
+            MainCityModel citiesWeatherModel = new Gson().fromJson(json, MainCityModel.class);
+            java.util.List<MainModelList> weatherList = citiesWeatherModel.getList();
+            if (citiesWeatherModel.getCount() == null){
+                idCity = citiesWeatherModel.getId();
+            }else {
+                idCity = weatherList.get(position).getId();
+            }
+            WeatherAPI.getClient()
+                    .create(WeatherAPI.FiveDaysWeather.class)
+                    .getFiveDaysWeather(idCity, Const.KEY)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(fiveDays -> {
+                        weekList = fiveDays.getList();
+                        weatherMapJSON.setList(weekList);
+                        String cityName = fiveDays.getCity().getName();
+                        listener.closeProgressDialog();
+                        responce = new Gson().toJson(weatherMapJSON, OpenWeatherMapJSON.class);
+                        viewPager.setAdapter(new MyPagerAdapter(getChildFragmentManager(), responce, cityName));
+                        toolbar.setTitle(fiveDays.getCity().getName() + "");
+                    });
         }
-        WeatherAPI.getClient()
-                .create(WeatherAPI.FiveDaysWeather.class)
-                .getFiveDaysWeather(idCity, Const.KEY)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(fiveDays -> {
-                    weekList = fiveDays.getList();
-                    weatherMapJSON.setList(weekList);
-                    String cityName = fiveDays.getCity().getName();
-                    listener.closeProgressDialog();
-                    responce = new Gson().toJson(weatherMapJSON, OpenWeatherMapJSON.class);
-                    viewPager.setAdapter(new MyPagerAdapter(getChildFragmentManager(), responce, cityName));
-                    toolbar.setTitle(fiveDays.getCity().getName() + "");
-            });
+    }
+
+    public interface Listener{
+        void callDbHelperSave();
     }
 
     @Override
@@ -131,57 +151,78 @@ public class WeatherDescriptionFragment extends Fragment {
         switch (item.getItemId()){
             case android.R.id.home:
                 getFragmentManager().popBackStack();
-                Log.d(TAG, "size = " + getFragmentManager().getBackStackEntryCount());
-                return true;
+                setHasOptionsMenu(true);
+               break;
+            case R.id.add_to_history:
+
         }
-        return super.onOptionsItemSelected(item);
+        return true;
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu, menu);
-        MenuItem addItem = menu.findItem(R.id.add_to_history);
-        addItem.setVisible(false);
-        MenuItem history = menu.findItem(R.id.my_history);
-        history.setVisible(false);
+        if (position == DB_CHECK){
+            menu.clear();
+        }else {
+            MenuItem addItem = menu.findItem(R.id.add_to_history);
+            addItem.setVisible(false);
+        }
+//        MenuItem history = menu.findItem(R.id.my_history);
+//        history.setVisible(false);
+
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     class MyPagerAdapter extends FragmentStatePagerAdapter {
 
-        private String str, city;
+        private String json, city;
         public MyPagerAdapter(FragmentManager fm, String response, String cityName) {
             super(fm);
-            str = response;
+            json = response;
             city = cityName;
         }
 
         @Override
         public Fragment getItem(int position) {
-            Log.d(TAG, "in adapter response = " + str);
-            return WeatherPagerFragment.newInstance(str, position, city);
+            Log.d(TAG, "in adapter response = " + json);
+            return WeatherPagerFragment.newInstance(json, position, city);
         }
 
         @Override
         public int getCount() {
-            return Const.COUNT_DAYS;
+            if (city == null){
+                return new Gson()
+                        .fromJson(json, WrapperMainCityModel.class)
+                        .getModelList()
+                        .size();
+            }else
+                return Const.COUNT_DAYS;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            switch (position){
-                case 0:
-                    return "Today";
-                case 1:
-                    return "Tomorrow";
-                case 2:
-                    return "Today + 2 days";
-                case 3:
-                    return "Today + 3 days";
-                case 4:
-                    return "Today + 4 days";
-                default:
-                    return "Error";
+            if (city == null){
+                return new Gson()
+                        .fromJson(json, WrapperMainCityModel.class)
+                        .getModelList()
+                        .get(position)
+                        .getName();
+            }else {
+                switch (position){
+                    case 0:
+                        return "Today";
+                    case 1:
+                        return "Tomorrow";
+                    case 2:
+                        return "Today + 2 days";
+                    case 3:
+                        return "Today + 3 days";
+                    case 4:
+                        return "Today + 4 days";
+                    default:
+                        return "Error";
+                }
             }
         }
     }

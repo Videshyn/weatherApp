@@ -6,6 +6,34 @@ import com.google.gson.annotations.SerializedName;
 
 public class MainCityModel {
 
+    public MainCityModel(String tmpDb, String pressureDb, String humidityDb, String windModel, int idDB, String dateDb, String descriptionDb, String name, String iconURLDB) {
+        this.tmpDb = tmpDb;
+        this.pressureDb = pressureDb;
+        this.humidityDb = humidityDb;
+        this.windModel = windModel;
+        this.idDB = idDB;
+        this.dateDb = dateDb;
+        this.descriptionDb = descriptionDb;
+        this.name = name;
+        this.iconURLDB = iconURLDB;
+    }
+
+    @SerializedName("iconURLDB")
+    @Expose
+    private String iconURLDB;
+
+    @SerializedName("tmpDb")
+    @Expose
+    private String tmpDb;
+
+    @SerializedName("pressureDb")
+    @Expose
+    private String pressureDb;
+
+    @SerializedName("humidityDb")
+    @Expose
+    private String humidityDb;
+
     @SerializedName("windModel")
     @Expose
     private String windModel;
@@ -16,11 +44,11 @@ public class MainCityModel {
 
     @SerializedName("dateStr")
     @Expose
-    private String date;
+    private String dateDb;
 
     @SerializedName("description")
     @Expose
-    private String description;
+    private String descriptionDb;
 
     @SerializedName("coord")
     @Expose
@@ -189,5 +217,70 @@ public class MainCityModel {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getWindModel() {
+        return windModel;
+    }
+
+    public void setWindModel(String windModel) {
+        this.windModel = windModel;
+    }
+
+    public int getIdDB() {
+        return idDB;
+    }
+
+    public void setIdDB(int idDB) {
+        this.idDB = idDB;
+    }
+
+
+    public String getTmpDb() {
+        return tmpDb;
+    }
+
+    public void setTmpDb(String tmpDb) {
+        this.tmpDb = tmpDb;
+    }
+
+    public String getPressureDb() {
+        return pressureDb;
+    }
+
+    public void setPressureDb(String pressureDb) {
+        this.pressureDb = pressureDb;
+    }
+
+    public String getHumidityDb() {
+        return humidityDb;
+    }
+
+    public void setHumidityDb(String humidityDb) {
+        this.humidityDb = humidityDb;
+    }
+
+    public String getDateDb() {
+        return dateDb;
+    }
+
+    public void setDateDb(String dateDb) {
+        this.dateDb = dateDb;
+    }
+
+    public String getDescriptionDb() {
+        return descriptionDb;
+    }
+
+    public void setDescriptionDb(String descriptionDb) {
+        this.descriptionDb = descriptionDb;
+    }
+
+    public String getIconURLDB() {
+        return iconURLDB;
+    }
+
+    public void setIconURLDB(String iconURLDB) {
+        this.iconURLDB = iconURLDB;
     }
 }

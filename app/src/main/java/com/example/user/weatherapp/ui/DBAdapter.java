@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.user.weatherapp.R;
-import com.example.user.weatherapp.pojo.HistoryModel;
+import com.example.user.weatherapp.pojo.coords_pojo.MainCityModel;
 import com.example.user.weatherapp.utils.DBHelper;
 
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ import static com.example.user.weatherapp.utils.Const.DB_VERSION;
 public class DBAdapter extends RecyclerView.Adapter<DBAdapter.ViewHolder> {
 
     private static final String TAG = DBAdapter.class.getSimpleName();
-    private List<HistoryModel> list = new ArrayList<>();
+    private List<MainCityModel> list = new ArrayList<>();
     private DBHelper dbHelper;
     private Listener dbAdapterListener;
 
@@ -48,14 +48,14 @@ public class DBAdapter extends RecyclerView.Adapter<DBAdapter.ViewHolder> {
         final TextView temp = mView.findViewById(R.id.temperature_card);
         final TextView data = mView.findViewById(R.id.date_card);
 
-        Glide.with(img.getContext()).load(list.get(position).getIconUrlModel()).into(img);
-        cityName.setText(list.get(position).getCityNameModel() + "");
-        temp.setText(list.get(position).getTmpModel() + "°C");
-        data.setText(list.get(position).getDataModel());
+        Glide.with(img.getContext()).load(list.get(position).getIconURLDB()).into(img);
+        cityName.setText(list.get(position).getName() + "");
+        temp.setText(list.get(position).getTmpDb() + "°C");
+        data.setText(list.get(position).getDateDb());
 
-        mView.setOnClickListener(event -> dbAdapterListener.clickElement(list.get(position)));
+        mView.setOnClickListener(event -> dbAdapterListener.clickElement(list, position));
         Log.d(TAG, "list = " + list.size());
-        Log.d(TAG, "element = " + (list.get(position) instanceof HistoryModel));
+        Log.d(TAG, "element = " + (list.get(position) instanceof MainCityModel));
     }
 
 
@@ -75,6 +75,6 @@ public class DBAdapter extends RecyclerView.Adapter<DBAdapter.ViewHolder> {
     }
 
     public interface Listener{
-        void clickElement(HistoryModel historyModel);
+        void clickElement(List<MainCityModel> lists, int currentPosition);
     }
 }
