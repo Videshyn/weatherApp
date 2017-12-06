@@ -4,7 +4,12 @@ package com.example.user.weatherapp.ui;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -61,17 +66,37 @@ public class DBWeatherDescription extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.pager_fragment, container, false);
 
+        Toolbar toolbar = view.findViewById(R.id.pager_fragment_toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         initUi(view);
 
         Glide.with(getContext()).load(historyModel.getIconUrlModel()).into(img);
-        description.setText(historyModel.getDescriptionModel());;
+        description.setText(historyModel.getDescriptionModel());
         date.setText(historyModel.getDataModel());
         wind.setText(historyModel.getWindModel());
         temp.setText(historyModel.getTmpModel());
         pressure.setText(historyModel.getPressureModel());
         humidity.setText(historyModel.getHumadityModel());
 
+        setHasOptionsMenu(true);
         return view;
     }
+//
+//    @Override
+//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+//        inflater.inflate(R.menu.menu, menu);
+//        menu.clear();
+//    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                getFragmentManager().popBackStack();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }

@@ -6,6 +6,22 @@ import com.google.gson.annotations.SerializedName;
 
 public class MainCityModel {
 
+    @SerializedName("windModel")
+    @Expose
+    private String windModel;
+
+    @SerializedName("idDB")
+    @Expose
+    private int idDB;
+
+    @SerializedName("dateStr")
+    @Expose
+    private String date;
+
+    @SerializedName("description")
+    @Expose
+    private String description;
+
     @SerializedName("coord")
     @Expose
     private Coord coord;

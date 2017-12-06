@@ -143,7 +143,7 @@ public class WeatherDescriptionFragment extends Fragment {
         MenuItem addItem = menu.findItem(R.id.add_to_history);
         addItem.setVisible(false);
         MenuItem history = menu.findItem(R.id.my_history);
-        history.setVisible(true);
+        history.setVisible(false);
         super.onCreateOptionsMenu(menu, inflater);
     }
 

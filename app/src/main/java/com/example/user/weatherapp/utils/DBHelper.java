@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.user.weatherapp.R;
 import com.example.user.weatherapp.pojo.HistoryModel;
 import com.example.user.weatherapp.pojo.pojo_robot.OpenWeatherMapJSON;
 import com.google.gson.Gson;
@@ -17,8 +16,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.user.weatherapp.utils.Const.DB_NAME;
-import static com.example.user.weatherapp.utils.Const.DB_VERSION;
 import static com.example.user.weatherapp.utils.Const.ICON_URL;
 import static com.example.user.weatherapp.utils.Const.PNG;
 

@@ -233,6 +233,7 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
                 }, exception ->
                     Toast.makeText(getActivity(), "Not found. Correct your response.", Toast.LENGTH_LONG).show()
                 );
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -262,5 +263,12 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(flag);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(flag);
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setHasOptionsMenu(true);
+    }
+
 
 }
