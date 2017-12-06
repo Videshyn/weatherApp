@@ -1,9 +1,5 @@
 package com.example.user.weatherapp.retrofit;
 
-import android.util.Log;
-
-
-import com.example.user.weatherapp.pojo.city_pojo.ExampleCity;
 import com.example.user.weatherapp.pojo.coords_pojo.Example;
 import com.example.user.weatherapp.pojo.pojo_robot.OpenWeatherMapJSON;
 
@@ -27,7 +23,7 @@ public class WeatherAPI {
 
     public interface ApiInterface {
         @GET("weather")
-        Observable<ExampleCity> getCityWeather(
+        Observable<Example> getCityWeather(
                 @Query("q") String q,
                 @Query("appid") String appid
         );

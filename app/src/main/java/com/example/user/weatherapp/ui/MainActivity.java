@@ -44,7 +44,6 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
         Log.d(TAG, "onCreate: start");
         latET = (EditText) findViewById(R.id.latET);
         lonET = (EditText) findViewById(R.id.lonET);
-
 //        WeatherAPI.WeekResponce api = WeatherAPI.getClient().create(WeatherAPI.WeekResponce.class);
 //        Call<WeekWeather> call = api.getWeek(706483, Const.KEY);
 //
@@ -59,7 +58,6 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
 //                Log.d(TAG, "" + t.getMessage());
 //            }
 //        });
-
         if (Utils.checkNetworkConnection(this)) {
             Log.d(TAG, "onCreate: in if oncreate");
             startWeatherFragment();
@@ -130,18 +128,7 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
     private void startWeatherFragment() {
         showProgressDialog();
         Log.d(TAG, "startWeatherFragment: ");
-
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-//                != PackageManager.PERMISSION_GRANTED && ActivityCompat
-//                .checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-//                != PackageManager.PERMISSION_GRANTED) {
-//
-//            return;
-//        }
         getLocationFragment();
-
-        Log.d(TAG, "startWeatherFragment: in the end ");
-
     }
 
     private void showErrorDialog() {

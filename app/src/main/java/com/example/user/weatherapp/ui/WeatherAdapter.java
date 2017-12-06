@@ -10,9 +10,10 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.user.weatherapp.R;
-import com.example.user.weatherapp.pojo.city_pojo.ExampleCity;
+import com.example.user.weatherapp.pojo.coords_pojo.Example;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.user.weatherapp.utils.Const.ICON_URL;
@@ -25,22 +26,20 @@ import static com.example.user.weatherapp.utils.Const.PNG;
 public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHolder> {
 
     private static final String TAG = WeatherAdapter.class.getSimpleName();
-    public List<com.example.user.weatherapp.pojo.coords_pojo.List> lists;
+
     private Listener weatherAdapterListener;
-    private ExampleCity exampleCity;
+    private Example exampleCity;
+    private List<com.example.user.weatherapp.pojo.coords_pojo.List> citiesList = new ArrayList<>();
 
-    public WeatherAdapter(List<com.example.user.weatherapp.pojo.coords_pojo.List> lists, Listener weatherAdapterListener) {
-        this.lists = lists;
-        this.weatherAdapterListener = weatherAdapterListener;
-    }
-
-    public WeatherAdapter(ExampleCity exampleCity, Listener weatherAdapterListener) {
+    public WeatherAdapter(Example exampleCity, Listener weatherAdapterListener) {
         this.exampleCity = exampleCity;
         this.weatherAdapterListener = weatherAdapterListener;
+        citiesList = exampleCity.getList();
     }
 
-    public void updateList(){
-
+    public void updateList(Example exampleCity){
+        this.exampleCity = exampleCity;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -56,42 +55,30 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
         final TextView temperature = (TextView) cardView.findViewById(R.id.temperature_card);
         final ImageView img = (ImageView) cardView.findViewById(R.id.img_card);
 
-        if (exampleCity != null){
+        if (exampleCity.getCount() == null){
+            Log.d(TAG, "getCount == null");
             cityName.setText(exampleCity.getName());
             double tmpCity = new BigDecimal(exampleCity.getMain().getTemp() - 273.15).setScale(1, BigDecimal.ROUND_UP).doubleValue();
             temperature.setText(tmpCity + "");
             Glide.with(img.getContext()).load(ICON_URL + exampleCity.getWeather().get(0).getIcon() + PNG).into(img);
-            cardView.setOnClickListener(v -> weatherAdapterListener.clickElement(exampleCity));
-        }else {
-            if (lists.size() == 0){
-                cityName.setText("Nothing to show");
-            }
-            cityName.setText(lists.get(position).getName());
-            double temp = new BigDecimal(lists.get(position).getMain().getTemp() - 273.15).setScale(1, BigDecimal.ROUND_UP).doubleValue();
+            cardView.setOnClickListener(v -> weatherAdapterListener.clickElement(exampleCity, 0));
+        }else if (exampleCity.getCount() > 0){
+            Log.d(TAG, "getCount != null");
+            cityName.setText(citiesList.get(position).getName());
+            double temp = new BigDecimal(citiesList.get(position).getMain().getTemp() - 273.15).setScale(1, BigDecimal.ROUND_UP).doubleValue();
             temperature.setText(temp + "°C");
-            Glide.with(img.getContext()).load(ICON_URL + lists.get(position).getWeather().get(0).getIcon() + PNG).into(img);
-            cardView.setOnClickListener(v -> weatherAdapterListener.clickElement(lists, position));
-
-            Log.d(TAG, "position = " + position + " cnt = " + lists.size());
-//            if ((position + 1) >= getItemCount() && lists.size() < 50){
-//                try {
-//                    Thread.sleep(500);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//                weatherAdapterListener.loadNextPack(position, (lists.size() + 9));
-//
-//            }
-            Log.d(TAG, "list size = " + lists.size());
+            Glide.with(img.getContext()).load(ICON_URL + citiesList.get(position).getWeather().get(0).getIcon() + PNG).into(img);
+            cardView.setOnClickListener(v -> weatherAdapterListener.clickElement(exampleCity, position));
         }
     }
 
     @Override
     public int getItemCount() {
-        if (exampleCity != null){
+        if (exampleCity.getCount() == null){
+            Log.d(TAG, "getItemCount: " + exampleCity.getId());
             return 1;
         }else
-            return lists.size();
+            return citiesList.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -103,8 +90,8 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
     }
 
     public interface Listener {
-        void clickElement(List<com.example.user.weatherapp.pojo.coords_pojo.List> lists, int position);
-        void clickElement(ExampleCity exampleCity);
+//        void clickElement(List<com.example.user.weatherapp.pojo.coords_pojo.List> lists, int position);
+        void clickElement(Example exampleCity, int position);
 //        void loadNextPack(int down_limit, int up_limit);
     }
 }

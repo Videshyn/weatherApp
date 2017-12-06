@@ -20,7 +20,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.user.weatherapp.R;
-import com.example.user.weatherapp.pojo.city_pojo.ExampleCity;
 import com.example.user.weatherapp.pojo.coords_pojo.Example;
 import com.example.user.weatherapp.pojo.coords_pojo.List;
 import com.example.user.weatherapp.pojo.pojo_robot.ListItem;
@@ -43,7 +42,6 @@ public class WeatherDescriptionFragment extends Fragment {
 
     private String json;
     private int position;
-    private int checkParam;
     private static final String TAG = WeatherDescriptionFragment.class.getSimpleName();
     private Toolbar toolbar;
     private ImageView img;
@@ -53,12 +51,11 @@ public class WeatherDescriptionFragment extends Fragment {
     private OpenWeatherMapJSON weatherMapJSON = new OpenWeatherMapJSON();
     private CityListFragment.Listener listener;
 
-    public static WeatherDescriptionFragment newInstance(String param1, int param2, int checkParam) {
+    public static WeatherDescriptionFragment newInstance(String param1, int param2) {
         WeatherDescriptionFragment fragment = new WeatherDescriptionFragment();
         Bundle args = new Bundle();
         args.putString(JSON, param1);
         args.putInt(POSITION, param2);
-        args.putInt(CHECK_PARAM, checkParam);
         fragment.setArguments(args);
         return fragment;
     }
@@ -69,7 +66,6 @@ public class WeatherDescriptionFragment extends Fragment {
         if (getArguments() != null) {
             json = getArguments().getString(JSON);
             position = getArguments().getInt(POSITION);
-            checkParam = getArguments().getInt(CHECK_PARAM);
         }
     }
 
@@ -89,15 +85,13 @@ public class WeatherDescriptionFragment extends Fragment {
     private void callWeatherWeekAPI(ViewPager viewPager){
         listener.openProgressDialog();
         Integer idCity = 0;
-        if (checkParam == Const.MANY_ELEMENTS){
-            Example example = new Gson().fromJson(json, Example.class);
-            java.util.List<List> exampleList = example.getList();
-            idCity = exampleList.get(position).getId();
-        }else if (checkParam == Const.ONE_ELEMENT) {
-            ExampleCity exampleCity = new Gson().fromJson(json, ExampleCity.class);
-            idCity = exampleCity.getId();
+        Example citiesWeatherModel = new Gson().fromJson(json, Example.class);
+        java.util.List<List> weatherList = citiesWeatherModel.getList();
+        if (citiesWeatherModel.getCount() == null){
+            idCity = citiesWeatherModel.getId();
+        }else {
+            idCity = weatherList.get(position).getId();
         }
-
         WeatherAPI.getClient()
                 .create(WeatherAPI.FiveDaysWeather.class)
                 .getFiveDaysWeather(idCity, Const.KEY)
@@ -106,18 +100,12 @@ public class WeatherDescriptionFragment extends Fragment {
                 .subscribe(fiveDays -> {
                     weekList = fiveDays.getList();
                     weatherMapJSON.setList(weekList);
-
                     String cityName = fiveDays.getCity().getName();
-
-                    Log.d(TAG, "in rx list size = " + weekList.size());
-                    Log.d(TAG, "callWeatherWeekAPI: " + fiveDays.getList().size());
                     listener.closeProgressDialog();
                     responce = new Gson().toJson(weatherMapJSON, OpenWeatherMapJSON.class);
-                    Log.d(TAG, "responce = " + responce);
                     viewPager.setAdapter(new MyPagerAdapter(getChildFragmentManager(), responce, cityName));
                     toolbar.setTitle(fiveDays.getCity().getName() + "");
             });
-
     }
 
     @Override
@@ -131,62 +119,6 @@ public class WeatherDescriptionFragment extends Fragment {
                     + " must implement OnFragmentInteractionListener");
         }
     }
-//
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//                             Bundle savedInstanceState) {
-//        View view = inflater.inflate(R.layout.fragment_weather_description, container, false);
-//        initUI(view);
-//
-//        if (checkParam == 100){
-//            Log.d(TAG, "json" + json);
-//            Example example = new Gson().fromJson(json, Example.class);
-//            java.util.List<List> exampleList = example.getList();
-//            toolbar.setTitle(exampleList.get(position).getName() + "");
-//            Glide.with(img.getContext()).load(ICON_URL
-//                    + exampleList.get(position).getWeather().get(0).getIcon()
-//                    + PNG).into(img);
-//            double temp = new BigDecimal(exampleList.get(position).getMain().getTemp() - 273.15).setScale(2, BigDecimal.ROUND_UP).doubleValue();
-//            temperature.setText("Temperature now = " + temp + " °C");
-//            double tempMin = new BigDecimal(exampleList.get(position).getMain().getTempMin() - 273.15).setScale(2, BigDecimal.ROUND_UP).doubleValue();
-//            temperatureMin.setText("min temperature = " + tempMin + " °C");
-//            double tempMax = new BigDecimal(exampleList.get(position).getMain().getTempMax() - 273.15).setScale(2, BigDecimal.ROUND_UP).doubleValue();
-//            temperatureMax.setText("max temperature = " + tempMax + " °C");
-//            pressure.setText("pressure = " + exampleList.get(position).getMain().getPressure() + "mbar");
-//            humidity.setText("humidity = " + exampleList.get(position).getMain().getHumidity() + "%");
-//            description.setText("description: " + exampleList.get(position).getWeather().get(0).getDescription());
-//            if (exampleList.get(position).getWind() != null){
-//                wind.setText("WindCity speed = "  + exampleList.get(position).getWind().getSpeed() + "km/h");
-//            }else {
-//                wind.setText("WindCity speed = 0.0km/h");
-//            }
-//        }else if (checkParam == 200){
-//            ExampleCity exampleCity = new Gson().fromJson(json, ExampleCity.class);
-//            toolbar.setTitle(exampleCity.getName() + "");
-//            Glide.with(img.getContext())
-//                    .load(ICON_URL
-//                            + exampleCity.getWeather().get(0).getIcon()
-//                            + PNG)
-//                    .into(img);
-//            double temp = new BigDecimal(exampleCity.getMain().getTemp() - 273.15).setScale(2, BigDecimal.ROUND_UP).doubleValue();
-//            temperature.setText("Temperature now = " + temp + " °C");
-//            double tempMin = new BigDecimal(exampleCity.getMain().getTempMin() - 273.15).setScale(2, BigDecimal.ROUND_UP).doubleValue();
-//            temperatureMin.setText("min temperature = " + tempMin + " °C");
-//            double tempMax = new BigDecimal(exampleCity.getMain().getTempMax() - 273.15).setScale(2, BigDecimal.ROUND_UP).doubleValue();
-//            temperatureMax.setText("max temperature = " + tempMax + " °C");
-//            pressure.setText("pressure = " + exampleCity.getMain().getPressure() + "mbar");
-//            humidity.setText("humidity = " + exampleCity.getMain().getHumidity() + "%");
-//            description.setText("description: " + exampleCity.getWeather().get(0).getDescription());
-//            if (exampleCity.getWind() != null){
-//                wind.setText("WindCity speed = "  + exampleCity.getWind().getSpeed() + "km/h");
-//            }else {
-//                wind.setText("WindCity speed = 0.0km/h");
-//            }
-//        }
-//
-//        setHasOptionsMenu(true);
-//        return view;
-//    }
 
     @Override
     public void onDetach() {
@@ -202,8 +134,6 @@ public class WeatherDescriptionFragment extends Fragment {
                 getFragmentManager().popBackStack();
                 Log.d(TAG, "size = " + getFragmentManager().getBackStackEntryCount());
                 return true;
-
-
         }
         return super.onOptionsItemSelected(item);
     }
@@ -217,23 +147,6 @@ public class WeatherDescriptionFragment extends Fragment {
         history.setVisible(true);
         super.onCreateOptionsMenu(menu, inflater);
     }
-
-    //    private void initUI(View view){
-//        toolbar = view.findViewById(R.id.toolbar);
-//        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-//        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
-//        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        img = view.findViewById(R.id.img_full_fragment);
-//        temperature = view.findViewById(R.id.temperature_full_fragment);
-//        temperatureMin = view.findViewById(R.id.min_temperature_full_fragment);
-//        temperatureMax = view.findViewById(R.id.max_temperature_full_fragment);
-//        pressure = view.findViewById(R.id.pressure_full_fragment);
-//        humidity = view.findViewById(R.id.humidity_full_fragment);
-//        description = view.findViewById(R.id.description_full_fragment);
-//        wind = view.findViewById(R.id.wind_full_fragment);
-//    }
-
-
 
     class MyPagerAdapter extends FragmentStatePagerAdapter {
 
