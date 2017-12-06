@@ -3,6 +3,7 @@ package com.example.user.weatherapp.ui;
 import android.content.Context;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -19,13 +20,16 @@ import java.util.List;
 import static com.example.user.weatherapp.utils.Const.DB_NAME;
 import static com.example.user.weatherapp.utils.Const.DB_VERSION;
 
-public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecyclerViewAdapter.ViewHolder> {
+public class DBAdapter extends RecyclerView.Adapter<DBAdapter.ViewHolder> {
 
+    private static final String TAG = DBAdapter.class.getSimpleName();
     private List<HistoryModel> list = new ArrayList<>();
     private DBHelper dbHelper;
+    private Listener dbAdapterListener;
 
-    public MyItemRecyclerViewAdapter(Context context) {
+    public DBAdapter(Context context, Listener dbAdapterListener) {
         dbHelper = new DBHelper(context, DB_NAME, null, DB_VERSION);
+        this.dbAdapterListener = dbAdapterListener;
         list = dbHelper.readHistory();
     }
 
@@ -36,7 +40,7 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         CardView mView = holder.cardView;
 
         final ImageView img = mView.findViewById(R.id.img_card);
@@ -49,8 +53,11 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
         temp.setText(list.get(position).getTmpModel() + "°C");
         data.setText(list.get(position).getDataModel());
 
-
+        mView.setOnClickListener(event -> dbAdapterListener.clickElement(list.get(position)));
+        Log.d(TAG, "list = " + list.size());
+        Log.d(TAG, "element = " + (list.get(position) instanceof HistoryModel));
     }
+
 
     @Override
     public int getItemCount() {
@@ -65,6 +72,9 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
             super(view);
             cardView = view;
         }
+    }
 
+    public interface Listener{
+        void clickElement(HistoryModel historyModel);
     }
 }

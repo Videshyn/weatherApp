@@ -1,6 +1,6 @@
 package com.example.user.weatherapp.retrofit;
 
-import com.example.user.weatherapp.pojo.coords_pojo.Example;
+import com.example.user.weatherapp.pojo.coords_pojo.MainCityModel;
 import com.example.user.weatherapp.pojo.pojo_robot.OpenWeatherMapJSON;
 
 import io.reactivex.Observable;
@@ -23,7 +23,7 @@ public class WeatherAPI {
 
     public interface ApiInterface {
         @GET("weather")
-        Observable<Example> getCityWeather(
+        Observable<MainCityModel> getCityWeather(
                 @Query("q") String q,
                 @Query("appid") String appid
         );
@@ -32,7 +32,7 @@ public class WeatherAPI {
 
     public interface WeatherInterface {
         @GET("find")
-        Observable<Example> getAll(
+        Observable<MainCityModel> getAll(
                 @Query("lat") Double lat,
                 @Query("lon") Double lon,
                 @Query("cnt") Integer cnt,

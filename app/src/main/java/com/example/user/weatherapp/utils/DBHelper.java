@@ -109,7 +109,7 @@ public class DBHelper extends SQLiteOpenHelper {
                         cursor.getString(descriptionColumnIndex)));
             }while (cursor.moveToNext());
         }else {
-            Toast.makeText(context, "List is empty", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "MainModelList is empty", Toast.LENGTH_LONG).show();
         }
         return modelList;
     }

@@ -10,8 +10,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.user.weatherapp.R;
+import com.example.user.weatherapp.pojo.HistoryModel;
+import com.google.gson.Gson;
 
-public class ItemFragment extends Fragment {
+import java.util.List;
+
+public class ItemFragment extends Fragment implements DBAdapter.Listener{
 
     private static final String TAG = ItemFragment.class.getSimpleName();
 
@@ -22,29 +26,26 @@ public class ItemFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             RecyclerView view = (RecyclerView) inflater.inflate(R.layout.fragment_item_list, null, false);
-            Log.d(TAG, "view == null = " + (view == null));
-
-            MyItemRecyclerViewAdapter adapter = new MyItemRecyclerViewAdapter(getContext());
+            DBAdapter adapter = new DBAdapter(getContext(), this);
             view.setAdapter(adapter);
             LinearLayoutManager manager = new LinearLayoutManager(getContext());
             view.setLayoutManager(manager);
-
-
-
-
         return view;
     }
 
 
-
-
-
+    @Override
+    public void clickElement(HistoryModel historyModel) {
+        DBWeatherDescription fragment = DBWeatherDescription.newInstance(new Gson().toJson(historyModel, HistoryModel.class));
+        getFragmentManager()
+                .beginTransaction()
+                .add(R.id.container, fragment)
+                .addToBackStack(null)
+                .commit();
+    }
 }

@@ -24,7 +24,7 @@ import android.widget.Toast;
 
 import com.example.user.weatherapp.R;
 import com.example.user.weatherapp.retrofit.WeatherAPI;
-import com.example.user.weatherapp.pojo.coords_pojo.Example;
+import com.example.user.weatherapp.pojo.coords_pojo.MainCityModel;
 import com.google.gson.Gson;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -47,7 +47,7 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
     private WeatherAdapter adapter;
     private Listener listener;
     private View view;
-    private Example citiesModel;
+    private MainCityModel citiesModel;
     private SwipeRefreshLayout swipeRefreshLayout;
     private SearchView searchView;
     private boolean toolBarFlag = false;
@@ -123,8 +123,8 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
     }
 
     @Override
-    public void clickElement(Example exampleCity, int position) {
-        String json = new Gson().toJson(exampleCity, Example.class);
+    public void clickElement(MainCityModel exampleCity, int position) {
+        String json = new Gson().toJson(exampleCity, MainCityModel.class);
         WeatherDescriptionFragment fragment = WeatherDescriptionFragment.newInstance(json, position);
         getFragmentManager()
                 .beginTransaction()

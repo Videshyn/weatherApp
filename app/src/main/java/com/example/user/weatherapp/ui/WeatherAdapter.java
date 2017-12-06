@@ -10,7 +10,8 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.user.weatherapp.R;
-import com.example.user.weatherapp.pojo.coords_pojo.Example;
+import com.example.user.weatherapp.pojo.coords_pojo.MainCityModel;
+import com.example.user.weatherapp.pojo.coords_pojo.MainModelList;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -28,16 +29,16 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
     private static final String TAG = WeatherAdapter.class.getSimpleName();
 
     private Listener weatherAdapterListener;
-    private Example exampleCity;
-    private List<com.example.user.weatherapp.pojo.coords_pojo.List> citiesList = new ArrayList<>();
+    private MainCityModel exampleCity;
+    private List<MainModelList> citiesList = new ArrayList<>();
 
-    public WeatherAdapter(Example exampleCity, Listener weatherAdapterListener) {
+    public WeatherAdapter(MainCityModel exampleCity, Listener weatherAdapterListener) {
         this.exampleCity = exampleCity;
         this.weatherAdapterListener = weatherAdapterListener;
         citiesList = exampleCity.getList();
     }
 
-    public void updateList(Example exampleCity){
+    public void updateList(MainCityModel exampleCity){
         this.exampleCity = exampleCity;
         notifyDataSetChanged();
     }
@@ -90,8 +91,6 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
     }
 
     public interface Listener {
-//        void clickElement(List<com.example.user.weatherapp.pojo.coords_pojo.List> lists, int position);
-        void clickElement(Example exampleCity, int position);
-//        void loadNextPack(int down_limit, int up_limit);
+        void clickElement(MainCityModel exampleCity, int position);
     }
 }

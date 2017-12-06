@@ -20,8 +20,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.user.weatherapp.R;
-import com.example.user.weatherapp.pojo.coords_pojo.Example;
-import com.example.user.weatherapp.pojo.coords_pojo.List;
+import com.example.user.weatherapp.pojo.coords_pojo.MainCityModel;
+import com.example.user.weatherapp.pojo.coords_pojo.MainModelList;
 import com.example.user.weatherapp.pojo.pojo_robot.ListItem;
 import com.example.user.weatherapp.pojo.pojo_robot.OpenWeatherMapJSON;
 import com.example.user.weatherapp.retrofit.WeatherAPI;
@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-import static com.example.user.weatherapp.utils.Const.CHECK_PARAM;
 import static com.example.user.weatherapp.utils.Const.JSON;
 import static com.example.user.weatherapp.utils.Const.POSITION;
 
@@ -85,8 +84,8 @@ public class WeatherDescriptionFragment extends Fragment {
     private void callWeatherWeekAPI(ViewPager viewPager){
         listener.openProgressDialog();
         Integer idCity = 0;
-        Example citiesWeatherModel = new Gson().fromJson(json, Example.class);
-        java.util.List<List> weatherList = citiesWeatherModel.getList();
+        MainCityModel citiesWeatherModel = new Gson().fromJson(json, MainCityModel.class);
+        java.util.List<MainModelList> weatherList = citiesWeatherModel.getList();
         if (citiesWeatherModel.getCount() == null){
             idCity = citiesWeatherModel.getId();
         }else {
