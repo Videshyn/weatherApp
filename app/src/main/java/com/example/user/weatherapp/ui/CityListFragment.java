@@ -53,8 +53,8 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
     private WeatherAdapter adapter;
     private Listener listener;
     private View view;
-    private Example example;
-    private List<com.example.user.weatherapp.pojo.coords_pojo.List> exampleList = new ArrayList<>();
+    private Example citiesModel;
+    private List<com.example.user.weatherapp.pojo.coords_pojo.List> citiesModelList = new ArrayList<>();
     private SwipeRefreshLayout swipeRefreshLayout;
     private SearchView searchView;
     private boolean toolBarFlag = false;
@@ -75,27 +75,26 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
         }else return -1;
     }
 
-
-
-    private void setLat(){
+    private void initCoors(){
         lat = getArguments().getDouble(LAT);
-    }
-    private void setLng(){
         lng = getArguments().getDouble(LNG);
     }
 
     private void callAPI(double latitude, double longitude){
-        Log.d(TAG, "callAPI: exampleList size = " + exampleList.size());
+        Log.d(TAG, "callAPI: citiesModelList size = " + citiesModelList.size());
         WeatherAPI.getClient().create(WeatherAPI.WeatherInterface.class)
                 .getAll(latitude, longitude, DEFAULT_CNT, KEY)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(example -> {
                     Log.d(TAG, "callAPI: subscribe");
-                    this.example = example;
+                    this.citiesModel = example;
 //                    loadNextPack(0, 50);
-                    exampleList = example.getList();
-                    adapter = new WeatherAdapter(exampleList, this);
+                    citiesModelList = example.getList();
+                    if (adapter != null){
+
+                    }
+                    adapter = new WeatherAdapter(citiesModelList, this);
                     recyclerView.setAdapter(adapter);
                     if (listener != null){
                         listener.closeProgressDialog();
@@ -110,12 +109,13 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
                 });
     }
 
+
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "call onCreate()");
-        setLat();
-        setLng();
+        initCoors();
         callAPI(lat, lng);
 
     }
@@ -183,7 +183,7 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
 //    public void loadNextPack(int down_limit, int up_limit) {
 //        Log.d(TAG, "call loadNextPack: ");
 //        for (int i = down_limit; i < up_limit; i ++){
-//            exampleList.add(i, example.getList().get(i));
+//            citiesModelList.add(i, citiesModel.getList().get(i));
 //        }
 //        if (down_limit != 0)
 //            adapter.notifyDataSetChanged();
@@ -310,7 +310,7 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
         }
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(false);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-//        Log.d(TAG, "in clickback list size = " + exampleList.size());
+//        Log.d(TAG, "in clickback list size = " + citiesModelList.size());
         listener.openProgressDialog();
         callAPI(lat, lng);
     }
