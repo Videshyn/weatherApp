@@ -64,26 +64,34 @@ public class ItemFragment extends Fragment implements DBAdapter.Listener{
                 .add(R.id.container, fragment)
                 .addToBackStack(null)
                 .commit();
-        setHasOptionsMenu(false);
+//        setHasOptionsMenu(false);
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu, menu);
-        menu.clear();
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        menu.setGroupVisible(R.id.group_add, false);
+        menu.setGroupVisible(R.id.group_history, false);
+        menu.setGroupVisible(R.id.group_search, false);
+        super.onPrepareOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:
+                Log.d(TAG, "itemFragment stack = " + getFragmentManager().getBackStackEntryCount());
                 if (getFragmentManager().getBackStackEntryCount() == 0){
                     getActivity().onBackPressed();
                 }else {
                     getFragmentManager().popBackStack();
                 }
-                break;
+                return true;
         }
-        return true;
+        return false;
     }
 }

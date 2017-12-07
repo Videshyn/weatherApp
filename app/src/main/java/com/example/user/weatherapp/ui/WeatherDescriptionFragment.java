@@ -23,11 +23,10 @@ import com.example.user.weatherapp.R;
 import com.example.user.weatherapp.pojo.coords_pojo.MainCityModel;
 import com.example.user.weatherapp.pojo.coords_pojo.MainModelList;
 import com.example.user.weatherapp.pojo.coords_pojo.WrapperMainCityModel;
-import com.example.user.weatherapp.pojo.pojo_robot.ListItem;
+import com.example.user.weatherapp.pojo.pojo_robot.WeatherItemList;
 import com.example.user.weatherapp.pojo.pojo_robot.OpenWeatherMapJSON;
 import com.example.user.weatherapp.retrofit.WeatherAPI;
 import com.example.user.weatherapp.utils.Const;
-import com.example.user.weatherapp.utils.DBHelper;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -37,13 +36,10 @@ import io.reactivex.schedulers.Schedulers;
 
 import static com.example.user.weatherapp.utils.Const.CURRENT_POSITION;
 import static com.example.user.weatherapp.utils.Const.DB_CHECK;
-import static com.example.user.weatherapp.utils.Const.DB_NAME;
-import static com.example.user.weatherapp.utils.Const.DB_VERSION;
 import static com.example.user.weatherapp.utils.Const.JSON;
 import static com.example.user.weatherapp.utils.Const.POSITION;
 
 public class WeatherDescriptionFragment extends Fragment {
-
 
     private String json;
     private int position, currentPosition;
@@ -52,10 +48,9 @@ public class WeatherDescriptionFragment extends Fragment {
     private ImageView img;
     private TextView temperature, temperatureMax, temperatureMin, pressure, humidity, description, wind;
     private String responce;
-    private java.util.List<ListItem> weekList = new ArrayList<>();
+    private java.util.List<WeatherItemList> weekList = new ArrayList<>();
     private OpenWeatherMapJSON weatherMapJSON = new OpenWeatherMapJSON();
     private CityListFragment.Listener listener;
-    private Listener dbSaveListener;
 
 
     public static WeatherDescriptionFragment newInstance(String json, int position, int currentPosition) {
@@ -123,14 +118,9 @@ public class WeatherDescriptionFragment extends Fragment {
         }
     }
 
-    public interface Listener{
-        void callDbHelperSave();
-    }
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        Log.d(TAG, "call onAttach()");
         if (context instanceof CityListFragment.Listener){
             listener = (CityListFragment.Listener) context;
         }else {
@@ -145,33 +135,26 @@ public class WeatherDescriptionFragment extends Fragment {
         listener = null;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Log.d(TAG, "onOptionsItemSelected: ");
-        switch (item.getItemId()){
-            case android.R.id.home:
-                getFragmentManager().popBackStack();
-                setHasOptionsMenu(true);
-               break;
-            case R.id.add_to_history:
-
-        }
-        return true;
-    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu, menu);
-        if (position == DB_CHECK){
-            menu.clear();
-        }else {
-            MenuItem addItem = menu.findItem(R.id.add_to_history);
-            addItem.setVisible(false);
-        }
-//        MenuItem history = menu.findItem(R.id.my_history);
-//        history.setVisible(false);
-
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        if (position == DB_CHECK){
+            menu.setGroupVisible(R.id.group_add, false);
+        }
+        menu.setGroupVisible(R.id.group_history, false);
+        menu.setGroupVisible(R.id.group_search, false);
+        super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        return false;
     }
 
     class MyPagerAdapter extends FragmentStatePagerAdapter {
@@ -185,7 +168,6 @@ public class WeatherDescriptionFragment extends Fragment {
 
         @Override
         public Fragment getItem(int position) {
-            Log.d(TAG, "in adapter response = " + json);
             return WeatherPagerFragment.newInstance(json, position, city);
         }
 
@@ -226,5 +208,4 @@ public class WeatherDescriptionFragment extends Fragment {
             }
         }
     }
-
 }

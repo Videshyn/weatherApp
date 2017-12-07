@@ -5,7 +5,7 @@ import javax.annotation.Generated;
 import com.google.gson.annotations.SerializedName;
 
 @Generated("com.robohorse.robopojogenerator")
-public class ListItem{
+public class WeatherItemList {
 
 	@SerializedName("dt")
 	private double dt;
@@ -98,7 +98,7 @@ public class ListItem{
 	@Override
  	public String toString(){
 		return 
-			"ListItem{" + 
+			"WeatherItemList{" +
 			"dt = '" + dt + '\'' + 
 			",rain = '" + rain + '\'' + 
 			",dt_txt = '" + dtTxt + '\'' + 

@@ -42,7 +42,6 @@ public class DBAdapter extends RecyclerView.Adapter<DBAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         CardView mView = holder.cardView;
-
         final ImageView img = mView.findViewById(R.id.img_card);
         final TextView cityName = mView.findViewById(R.id.city_name_card);
         final TextView temp = mView.findViewById(R.id.temperature_card);
@@ -54,8 +53,6 @@ public class DBAdapter extends RecyclerView.Adapter<DBAdapter.ViewHolder> {
         data.setText(list.get(position).getDateDb());
 
         mView.setOnClickListener(event -> dbAdapterListener.clickElement(list, position));
-        Log.d(TAG, "list = " + list.size());
-        Log.d(TAG, "element = " + (list.get(position) instanceof MainCityModel));
     }
 
 

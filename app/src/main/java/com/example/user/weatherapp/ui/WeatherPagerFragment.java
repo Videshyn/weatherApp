@@ -47,6 +47,7 @@ public class WeatherPagerFragment extends Fragment {
     private OpenWeatherMapJSON weatherMapJSON;
     private WrapperMainCityModel wrapperMainCityModel;
     private TextView temperature, temperatureMax, temperatureMin, pressure, humidity, description, wind;
+    private DBHelper dbHelper;
 
     public static WeatherPagerFragment newInstance(String responce, int pagerPosition, String cityName) {
         Log.d(TAG, "call newInstance:");
@@ -68,6 +69,7 @@ public class WeatherPagerFragment extends Fragment {
         humidity = view.findViewById(R.id.humidity_full_fragment);
         description = view.findViewById(R.id.description_full_fragment);
         wind = view.findViewById(R.id.wind_full_fragment);
+        dbHelper = new DBHelper(getContext(), DB_NAME, null, DB_VERSION);
     }
 
     @Override
@@ -179,31 +181,36 @@ public class WeatherPagerFragment extends Fragment {
         }
     }
 
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        switch (item.getItemId()){
-//            case android.R.id.home:
-//                getFragmentManager().popBackStack();
-//                break;
-//            case R.id.add_to_history:
-//                dbHelper.saveHistory(response, pagerPosition, cityName);
-//                break;
-//        }
-//        return true;
-//    }
-//
-//    @Override
-//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-//        inflater.inflate(R.menu.menu, menu);
-//        if (wrapperMainCityModel != null){
-//            menu.clear();
-//        }else {
-//            MenuItem addItem = menu.findItem(R.id.add_to_history);
-//            addItem.setVisible(true);
-//            MenuItem history = menu.findItem(R.id.my_history);
-//            history.setVisible(false);
-//        }
-//
-//        super.onCreateOptionsMenu(menu, inflater);
-//    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        if (wrapperMainCityModel != null){
+            menu.setGroupVisible(R.id.group_add, false);
+        }else {
+            menu.setGroupVisible(R.id.group_add, true);
+        }
+        menu.setGroupVisible(R.id.group_search, false);
+        menu.setGroupVisible(R.id.group_history, false);
+        super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Log.d(TAG, "size = " + getFragmentManager().getBackStackEntryCount());
+        switch (item.getItemId()){
+            case android.R.id.home:
+                getActivity().onBackPressed();
+                return true;
+            case R.id.add_to_history:
+                Log.d(TAG, "onOptionsItemSelected: ");
+                dbHelper.saveHistory(response, pagerPosition, cityName);
+                return true;
+        }
+        return false;
+    }
 }

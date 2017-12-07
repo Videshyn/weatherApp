@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import com.example.user.weatherapp.pojo.coords_pojo.MainCityModel;
 import com.example.user.weatherapp.pojo.pojo_robot.OpenWeatherMapJSON;
+import com.example.user.weatherapp.pojo.pojo_robot.WeatherItemList;
 import com.google.gson.Gson;
 
 import java.math.BigDecimal;
@@ -53,22 +54,25 @@ public class DBHelper extends SQLiteOpenHelper {
         OpenWeatherMapJSON weatherMapJSON = new Gson().fromJson(response, OpenWeatherMapJSON.class);
 
         ContentValues cv = new ContentValues();
+
+
         if (weatherMapJSON != null){
+            WeatherItemList weatherItemList = weatherMapJSON.getList().get(pagerPosition * 8);
             Log.d(TAG, "saveHistory: " + (weatherMapJSON.getCity() == null));
             cv.put("city_name", cityName);
-            cv.put("data", weatherMapJSON.getList().get(pagerPosition * 8).getDtTxt().split(" ")[0]);
+            cv.put("data", weatherItemList.getDtTxt().split(" ")[0]);
             cv.put("icon_url", ICON_URL
-                    + weatherMapJSON.getList().get(pagerPosition * 8).getWeather().get(0).getIcon()
+                    + weatherItemList.getWeather().get(0).getIcon()
                     + PNG);
-            cv.put("tmp", new BigDecimal(weatherMapJSON.getList().get(pagerPosition * 8).getMain().getTemp() - 273.15)
+            cv.put("tmp", new BigDecimal(weatherItemList.getMain().getTemp() - 273.15)
                     .setScale(2, BigDecimal.ROUND_UP).doubleValue() + "");
-            if (weatherMapJSON.getList().get(pagerPosition * 8).getWind() != null){
-                cv.put("wind_speed", weatherMapJSON.getList().get(pagerPosition * 8).getWind().getSpeed());
+            if (weatherItemList.getWind() != null){
+                cv.put("wind_speed", weatherItemList.getWind().getSpeed());
             }else
                 cv.put("wind_speed", "null");
-            cv.put("pressure", weatherMapJSON.getList().get(pagerPosition * 8).getMain().getPressure());
-            cv.put("humidity", weatherMapJSON.getList().get(pagerPosition * 8).getMain().getHumidity());
-            cv.put("description", weatherMapJSON.getList().get(pagerPosition * 8).getWeather().get(0).getDescription());
+            cv.put("pressure", weatherItemList.getMain().getPressure());
+            cv.put("humidity", weatherItemList.getMain().getHumidity());
+            cv.put("description", weatherItemList.getWeather().get(0).getDescription());
 
             Long rowId = database.insert("WEATHER", null, cv);
             Log.d(TAG, "rowId = " + rowId);

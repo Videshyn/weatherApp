@@ -20,7 +20,7 @@ public class OpenWeatherMapJSON {
 	private double message;
 
 	@SerializedName("list")
-	private List<ListItem> list;
+	private List<WeatherItemList> list;
 
 	public void setCity(City city){
 		this.city = city;
@@ -54,11 +54,11 @@ public class OpenWeatherMapJSON {
 		return message;
 	}
 
-	public void setList(List<ListItem> list){
+	public void setList(List<WeatherItemList> list){
 		this.list = list;
 	}
 
-	public List<ListItem> getList(){
+	public List<WeatherItemList> getList(){
 		return list;
 	}
 
