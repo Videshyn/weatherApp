@@ -1,4 +1,4 @@
-package com.example.user.weatherapp.ui.test;
+package com.example.user.weatherapp.ui.base;
 
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseBooleanArray;
@@ -12,7 +12,8 @@ import java.util.List;
 
 public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH>{
 
-    private SparseBooleanArray selectedItem;
+    public SparseBooleanArray selectedItem;
+    public ArrayList<Integer> list = new ArrayList<>();
 
     public SelectableAdapter() {
         selectedItem = new SparseBooleanArray();

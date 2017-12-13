@@ -30,11 +30,14 @@ public class DBHelper extends SQLiteOpenHelper {
     private final String CREATE_TABLE = "create table WEATHER (id integer primary key autoincrement, " +
             "city_name text, data text, icon_url text, tmp text, wind_speed text, pressure text, humidity text, description text);";
     private final String DROP_TABLE = "DROP TABLE IF EXISTS WEATHER";
+    private static final String TABLE_NAME = "WEATHER";
     private Context context;
+    private DBListener dbListener;
 
-    public DBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
+    public DBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version, DBListener dbListener) {
         super(context, name, factory, version);
         this.context = context;
+        this.dbListener = dbListener;
     }
 
     @Override
@@ -74,7 +77,7 @@ public class DBHelper extends SQLiteOpenHelper {
             cv.put("humidity", weatherItemList.getMain().getHumidity());
             cv.put("description", weatherItemList.getWeather().get(0).getDescription());
 
-            Long rowId = database.insert("WEATHER", null, cv);
+            Long rowId = database.insert(TABLE_NAME, null, cv);
             Log.d(TAG, "rowId = " + rowId);
         }else {
             Log.d(TAG, "weatherMapJson == null");
@@ -82,6 +85,18 @@ public class DBHelper extends SQLiteOpenHelper {
         Toast.makeText(context, "Added!", Toast.LENGTH_LONG).show();
         close();
         database.close();
+    }
+
+    public void deleteHistory(List<Integer> positionsList, List<Integer> idList){
+        SQLiteDatabase database = getWritableDatabase();
+        for (int i = 0, n = positionsList.size(); i < n; i ++){
+            int idRow = database.delete(TABLE_NAME, "id = " + idList.get(positionsList.get(i)), null);
+            Log.d(TAG, "del = " + idRow);
+            dbListener.updateRecyclerView(idList.get(positionsList.get(i)));
+        }
+
+        database.close();
+
     }
 
     public List<MainCityModel> readHistory(){
@@ -115,6 +130,10 @@ public class DBHelper extends SQLiteOpenHelper {
             Toast.makeText(context, "MainModelList is empty", Toast.LENGTH_LONG).show();
         }
         return modelList;
+    }
+
+    public interface DBListener{
+        void updateRecyclerView(int position);
     }
 
 }

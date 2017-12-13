@@ -37,7 +37,7 @@ import static com.example.user.weatherapp.utils.Const.RESPONSE;
  * Created by User on 30.11.2017
  */
 
-public class WeatherPagerFragment extends Fragment {
+public class WeatherPagerFragment extends Fragment implements DBHelper.DBListener{
 
     private static final String TAG = WeatherPagerFragment.class.getSimpleName();
     private static final String CITY_NAME = "CITY_NAME";
@@ -69,7 +69,7 @@ public class WeatherPagerFragment extends Fragment {
         humidity = view.findViewById(R.id.humidity_full_fragment);
         description = view.findViewById(R.id.description_full_fragment);
         wind = view.findViewById(R.id.wind_full_fragment);
-        dbHelper = new DBHelper(getContext(), DB_NAME, null, DB_VERSION);
+        dbHelper = new DBHelper(getContext(), DB_NAME, null, DB_VERSION, this);
     }
 
     @Override
@@ -212,5 +212,10 @@ public class WeatherPagerFragment extends Fragment {
                 return true;
         }
         return false;
+    }
+
+    @Override
+    public void updateRecyclerView(int position) {
+
     }
 }

@@ -150,7 +150,10 @@ public class ItemFragment extends Fragment implements DBAdapter.Listener{
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
                 switch (item.getItemId()){
                     case R.id.delete_am:
-
+                            adapter.deleteElements(actionMode);
+                            adapter.clearSelection();
+                            actionMode = null;
+                            adapter.notifyDataSetChanged();
                         return true;
 //                    case R.id.clear_selection_am:
 //                        adapter.clearSelection();
