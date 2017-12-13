@@ -111,15 +111,20 @@ public class DBAdapter extends SelectableAdapter<DBAdapter.ViewHolder>  implemen
         List<Integer> positionsList = new ArrayList<>(selectedItem.size());
         for (int i = 0, n = selectedItem.size(); i < n; i ++){
             positionsList.add(selectedItem.keyAt(i));
-
         }
+
         for (int i = 0, n = list.size(); i < n; i ++){
             idList.add(list.get(i).getIdDB());
         }
-
+        ArrayList<MainCityModel> models = new ArrayList<>();
+        for (int i = 0, n = positionsList.size(); i < n; i ++){
+            models.add(list.get(positionsList.get(i)));
+        }
+        Log.d(TAG, "size models = " + models.size());
         dbHelper.deleteHistory(positionsList, idList);
         if (actionMode != null){
             actionMode.finish();
+            list.removeAll(models);
             notifyDataSetChanged();
         }
 
