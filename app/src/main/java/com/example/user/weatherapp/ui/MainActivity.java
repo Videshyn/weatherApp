@@ -10,7 +10,11 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -20,7 +24,10 @@ import com.google.android.gms.location.LocationServices;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
-public class MainActivity extends AppCompatActivity implements CityListFragment.Listener {
+import java.security.PrivateKey;
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity implements CityListFragment.Listener{
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_CODE_REFRESH_COORDS = 200;
@@ -31,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+//        supportRequestWindowFeature(Window.FEATURE_ACTION_MODE_OVERLAY); // убирает прыжки toolbar при закрытии actionMode
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         JodaTimeAndroid.init(this);
@@ -219,5 +227,7 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
         if (progressDialog != null)
             progressDialog.dismiss();
     }
+
+
 
 }

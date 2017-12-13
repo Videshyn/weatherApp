@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+
+    <group
+        android:id="@+id/group_clear_selection">
+
+        <item
+            android:id="@+id/clear_selection_am"
+            android:title="@string/clear_selection"
+            android:icon="@drawable/clear_selection_icon"
+            app:showAsAction="always">
+
+        </item>
+
+    </group>
+
+    <group
+        android:id="@+id/group_delete_am">
+
+
+        <item
+            android:id="@+id/delete_am"
+            android:title="@string/delete"
+            android:icon="@drawable/delete"
+            app:showAsAction="always" />
+    </group>
+
+
+    <group
+        android:id="@+id/group_add_am">
+        <item
+            android:id="@+id/add_am"
+            android:title="@string/add"
+            android:icon="@drawable/plus_info"
+            app:showAsAction="always">
+
+        </item>
+    </group>
+
+
+</menu>

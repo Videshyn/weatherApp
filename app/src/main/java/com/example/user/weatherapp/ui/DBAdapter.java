@@ -5,6 +5,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -41,18 +42,10 @@ public class DBAdapter extends RecyclerView.Adapter<DBAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        CardView mView = holder.cardView;
-        final ImageView img = mView.findViewById(R.id.img_card);
-        final TextView cityName = mView.findViewById(R.id.city_name_card);
-        final TextView temp = mView.findViewById(R.id.temperature_card);
-        final TextView data = mView.findViewById(R.id.date_card);
-
-        Glide.with(img.getContext()).load(list.get(position).getIconURLDB()).into(img);
-        cityName.setText(list.get(position).getName() + "");
-        temp.setText(list.get(position).getTmpDb() + "°C");
-        data.setText(list.get(position).getDateDb());
-
-        mView.setOnClickListener(event -> dbAdapterListener.clickElement(list, position));
+        holder.cityName.setText(list.get(position).getName() + "");
+        holder.temp.setText(list.get(position).getTmpDb() + "°C");
+        holder.data.setText(list.get(position).getDateDb());
+        Glide.with(holder.img.getContext()).load(list.get(position).getIconURLDB()).into(holder.img);
     }
 
 
@@ -61,13 +54,26 @@ public class DBAdapter extends RecyclerView.Adapter<DBAdapter.ViewHolder> {
         return list.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
 
-        CardView cardView;
+
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+        TextView cityName, temp, data;
+        ImageView img;
 
         public ViewHolder(CardView view) {
             super(view);
-            cardView = view;
+            cityName = (TextView) view.findViewById(R.id.city_name_card);
+            temp = (TextView) view.findViewById(R.id.temperature_card);
+            data = (TextView) view.findViewById(R.id.date_card);
+            img = (ImageView) view.findViewById(R.id.img_card);
+            view.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (dbAdapterListener != null){
+                dbAdapterListener.clickElement(list, getAdapterPosition());
+            }
         }
     }
 

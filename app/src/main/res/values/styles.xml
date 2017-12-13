@@ -7,6 +7,8 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="searchViewStyle">@style/MySearchViewStyle</item>
+
+
     </style>
 
     <style name="MyThemeWithoutActionBar" parent="Theme.AppCompat.Light.NoActionBar">
@@ -14,6 +16,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="searchViewStyle">@style/MySearchViewStyle</item>
+        <item name="windowActionModeOverlay">true</item>
     </style>
 
     <style name="MySearchViewStyle" parent="Widget.AppCompat.SearchView">
