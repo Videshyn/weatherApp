@@ -32,12 +32,10 @@ public class DBHelper extends SQLiteOpenHelper {
     private final String DROP_TABLE = "DROP TABLE IF EXISTS WEATHER";
     private static final String TABLE_NAME = "WEATHER";
     private Context context;
-    private DBListener dbListener;
 
-    public DBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version, DBListener dbListener) {
+    public DBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
         this.context = context;
-        this.dbListener = dbListener;
     }
 
     @Override
@@ -52,12 +50,10 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public void saveHistory(String response, int pagerPosition, String cityName){
-
         SQLiteDatabase database = getWritableDatabase();
         OpenWeatherMapJSON weatherMapJSON = new Gson().fromJson(response, OpenWeatherMapJSON.class);
 
         ContentValues cv = new ContentValues();
-
 
         if (weatherMapJSON != null){
             WeatherItemList weatherItemList = weatherMapJSON.getList().get(pagerPosition * 8);
@@ -79,10 +75,10 @@ public class DBHelper extends SQLiteOpenHelper {
 
             Long rowId = database.insert(TABLE_NAME, null, cv);
             Log.d(TAG, "rowId = " + rowId);
+            Toast.makeText(context, "Added in row = " + rowId, Toast.LENGTH_LONG).show();
         }else {
             Log.d(TAG, "weatherMapJson == null");
         }
-        Toast.makeText(context, "Added!", Toast.LENGTH_LONG).show();
         close();
         database.close();
     }
@@ -92,11 +88,8 @@ public class DBHelper extends SQLiteOpenHelper {
         for (int i = 0, n = positionsList.size(); i < n; i ++){
             int idRow = database.delete(TABLE_NAME, "id = " + idList.get(positionsList.get(i)), null);
             Log.d(TAG, "del = " + idRow);
-            dbListener.updateRecyclerView(idList.get(positionsList.get(i)));
         }
-
         database.close();
-
     }
 
     public List<MainCityModel> readHistory(){
@@ -131,9 +124,4 @@ public class DBHelper extends SQLiteOpenHelper {
         }
         return modelList;
     }
-
-    public interface DBListener{
-        void updateRecyclerView(int position);
-    }
-
 }

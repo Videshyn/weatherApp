@@ -19,6 +19,7 @@ import com.example.user.weatherapp.R;
 import com.example.user.weatherapp.pojo.coords_pojo.MainCityModel;
 import com.example.user.weatherapp.pojo.coords_pojo.WrapperMainCityModel;
 import com.example.user.weatherapp.pojo.pojo_robot.OpenWeatherMapJSON;
+import com.example.user.weatherapp.pojo.pojo_robot.WeatherItemList;
 import com.example.user.weatherapp.utils.Const;
 import com.example.user.weatherapp.utils.DBHelper;
 import com.google.gson.Gson;
@@ -26,6 +27,7 @@ import com.google.gson.Gson;
 import org.joda.time.DateTime;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static com.example.user.weatherapp.utils.Const.DB_NAME;
 import static com.example.user.weatherapp.utils.Const.DB_VERSION;
@@ -37,7 +39,7 @@ import static com.example.user.weatherapp.utils.Const.RESPONSE;
  * Created by User on 30.11.2017
  */
 
-public class WeatherPagerFragment extends Fragment implements DBHelper.DBListener{
+public class WeatherPagerFragment extends Fragment{
 
     private static final String TAG = WeatherPagerFragment.class.getSimpleName();
     private static final String CITY_NAME = "CITY_NAME";
@@ -69,7 +71,7 @@ public class WeatherPagerFragment extends Fragment implements DBHelper.DBListene
         humidity = view.findViewById(R.id.humidity_full_fragment);
         description = view.findViewById(R.id.description_full_fragment);
         wind = view.findViewById(R.id.wind_full_fragment);
-        dbHelper = new DBHelper(getContext(), DB_NAME, null, DB_VERSION, this);
+        dbHelper = new DBHelper(getContext(), DB_NAME, null, DB_VERSION);
     }
 
     @Override
@@ -83,7 +85,6 @@ public class WeatherPagerFragment extends Fragment implements DBHelper.DBListene
         }else {
             weatherMapJSON = new Gson().fromJson(response, OpenWeatherMapJSON.class);
         }
-
         super.onCreate(savedInstanceState);
     }
 
@@ -92,13 +93,11 @@ public class WeatherPagerFragment extends Fragment implements DBHelper.DBListene
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.pager_fragment, container, false);
         initUI(view);
-
         if (wrapperMainCityModel != null){
             fillPagerFromDB();
         }else {
             fillPagerFromAPI();
         }
-
         setHasOptionsMenu(true);
         return view;
     }
@@ -111,7 +110,6 @@ public class WeatherPagerFragment extends Fragment implements DBHelper.DBListene
                         .get(pagerPosition)
                         .getIconURLDB())
                 .into(img);
-
         temperature.setText(getString(R.string.temperature_today) + " = " + model.getTmpDb());
         //in this case temperature min = date
         temperatureMin.setText(getString(R.string.Date) + model.getDateDb());
@@ -156,31 +154,31 @@ public class WeatherPagerFragment extends Fragment implements DBHelper.DBListene
     private void fillViews(int plusDays){
         String fullTmp = "";
         String jodaDay = new DateTime().plusDays(plusDays).toLocalDate().toString();
-        for (int i = 0, n = weatherMapJSON.getList().size(); i < n; i ++){
-            String loopToday = weatherMapJSON.getList().get(i).getDtTxt().split(" ")[0];
+
+        List<WeatherItemList> weatherItems = weatherMapJSON.getList();
+        WeatherItemList item = weatherItems.get(plusDays);
+
+        for (int i = 0, n = weatherItems.size(); i < n; i ++){
+            String loopToday = weatherItems.get(i).getDtTxt().split(" ")[0];
             if (loopToday.equals(jodaDay)){
-                double temp = new BigDecimal(weatherMapJSON.getList().get(i).getMain().getTemp() - 273.15).setScale(2, BigDecimal.ROUND_UP).doubleValue();
-                fullTmp = fullTmp + "\n" + weatherMapJSON.getList().get(i).getDtTxt() + "        " + temp + getString(R.string.celciy);
+                double temp = new BigDecimal(weatherItems.get(i).getMain().getTemp() - 273.15).setScale(2, BigDecimal.ROUND_UP).doubleValue();
+                fullTmp = fullTmp + "\n" + weatherItems.get(i).getDtTxt() + "        " + temp + getString(R.string.celciy);
             }
         }
         temperature.setText(getString(R.string.temperature_today) + fullTmp);
         plusDays = plusDays * 8;
-        Glide.with(img.getContext()).load(Const.ICON_URL + weatherMapJSON.getList().get(plusDays).getWeather().get(0).getIcon() + PNG).into(img);
-
-        double tempMin = new BigDecimal(weatherMapJSON.getList().get(plusDays).getMain().getTempMin() - 273.15).setScale(2, BigDecimal.ROUND_UP).doubleValue();
-        temperatureMin.setText(getString(R.string.min_temperature) + tempMin + getString(R.string.celciy));
-        double tempMax = new BigDecimal(weatherMapJSON.getList().get(plusDays).getMain().getTempMax() - 273.15).setScale(2, BigDecimal.ROUND_UP).doubleValue();
-        temperatureMax.setText(getString(R.string.max_temperature) + tempMax + getString(R.string.celciy));
-        pressure.setText(getString(R.string.pressure) + weatherMapJSON.getList().get(plusDays).getMain().getPressure() + getString(R.string.mbar));
-        humidity.setText(getString(R.string.humidty) + weatherMapJSON.getList().get(plusDays).getMain().getHumidity() + "%");
-        description.setText(getString(R.string.description) + weatherMapJSON.getList().get(plusDays).getWeather().get(0).getDescription());
-        if (weatherMapJSON.getList().get(plusDays).getWind() != null){
-            wind.setText(getString(R.string.wind_city_speed)  + weatherMapJSON.getList().get(plusDays).getWind().getSpeed() + getString(R.string.km_h));
+        Glide.with(img.getContext()).load(Const.ICON_URL + item.getWeather().get(0).getIcon() + PNG).into(img);
+        temperatureMin.setText(getString(R.string.min_temperature) + new BigDecimal(item.getMain().getTempMin() - 273.15).setScale(2, BigDecimal.ROUND_UP) + getString(R.string.celciy));
+        temperatureMax.setText(getString(R.string.max_temperature) + new BigDecimal(item.getMain().getTempMax() - 273.15).setScale(2, BigDecimal.ROUND_UP) + getString(R.string.celciy));
+        pressure.setText(getString(R.string.pressure) + item.getMain().getPressure() + getString(R.string.mbar));
+        humidity.setText(getString(R.string.humidty) + item.getMain().getHumidity() + "%");
+        description.setText(getString(R.string.description) + item.getWeather().get(0).getDescription());
+        if (weatherItems.get(plusDays).getWind() != null){
+            wind.setText(getString(R.string.wind_city_speed)  + item.getWind().getSpeed() + getString(R.string.km_h));
         }else {
             wind.setText(R.string.wind_city_null);
         }
     }
-
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -214,8 +212,4 @@ public class WeatherPagerFragment extends Fragment implements DBHelper.DBListene
         return false;
     }
 
-    @Override
-    public void updateRecyclerView(int position) {
-
-    }
 }

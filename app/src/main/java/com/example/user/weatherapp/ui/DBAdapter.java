@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.ArrayMap;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,10 +23,10 @@ import java.util.List;
 import static com.example.user.weatherapp.utils.Const.DB_NAME;
 import static com.example.user.weatherapp.utils.Const.DB_VERSION;
 
-public class DBAdapter extends SelectableAdapter<DBAdapter.ViewHolder>  implements DBHelper.DBListener{
+public class DBAdapter extends SelectableAdapter<DBAdapter.ViewHolder>{
 
     private static final String TAG = DBAdapter.class.getSimpleName();
-    private List<MainCityModel> list = new ArrayList<>();
+    private List<MainCityModel> dbEntitiesList = new ArrayList<>();
     private ArrayList<Integer> idList = new ArrayList<>();
     private DBHelper dbHelper;
     private Listener dbAdapterListener;
@@ -35,9 +34,9 @@ public class DBAdapter extends SelectableAdapter<DBAdapter.ViewHolder>  implemen
 
     public DBAdapter(Context context, Listener dbAdapterListener) {
         this.context = context;
-        dbHelper = new DBHelper(context, DB_NAME, null, DB_VERSION, this);
+        dbHelper = new DBHelper(context, DB_NAME, null, DB_VERSION);
         this.dbAdapterListener = dbAdapterListener;
-        list = dbHelper.readHistory();
+        dbEntitiesList = dbHelper.readHistory();
     }
 
     @Override
@@ -48,12 +47,11 @@ public class DBAdapter extends SelectableAdapter<DBAdapter.ViewHolder>  implemen
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        holder.cityName.setText(list.get(position).getName() + "");
-        holder.temp.setText(list.get(position).getTmpDb() + "°C");
-        holder.data.setText(list.get(position).getDateDb());
-        idList.add(list.get(position).getIdDB());
-        Glide.with(holder.img.getContext()).load(list.get(position).getIconURLDB()).into(holder.img);
-
+        holder.cityName.setText(dbEntitiesList.get(position).getName() + "");
+        holder.temperature.setText(dbEntitiesList.get(position).getTmpDb() + "°C");
+        holder.data.setText(dbEntitiesList.get(position).getDateDb());
+        idList.add(dbEntitiesList.get(position).getIdDB());
+        Glide.with(holder.img.getContext()).load(dbEntitiesList.get(position).getIconURLDB()).into(holder.img);
         if (isSelected(holder.getPosition())){
             holder.itemView.setBackgroundColor(context.getResources().getColor(R.color.light_blue));
         }else {
@@ -61,26 +59,47 @@ public class DBAdapter extends SelectableAdapter<DBAdapter.ViewHolder>  implemen
         }
     }
 
-
     @Override
     public int getItemCount() {
-        return list.size();
+        return dbEntitiesList.size();
     }
 
-    @Override
-    public void updateRecyclerView(int position) {
-        notifyItemRemoved(position);
+    public void deleteElements(ActionMode actionMode){
+        List<Integer> positionsList = new ArrayList<>(selectedItem.size());
+        for (int i = 0, n = selectedItem.size(); i < n; i ++){
+            positionsList.add(selectedItem.keyAt(i));
+        }
+        for (int i = 0, n = dbEntitiesList.size(); i < n; i ++){
+            idList.add(dbEntitiesList.get(i).getIdDB());
+        }
+        ArrayList<MainCityModel> removePattern = new ArrayList<>();
+        for (int i = 0, n = positionsList.size(); i < n; i ++){
+            removePattern.add(dbEntitiesList.get(positionsList.get(i)));
+        }
+        Log.d(TAG, "size models = " + removePattern.size());
+        dbHelper.deleteHistory(positionsList, idList);
+        if (actionMode != null){
+            actionMode.finish();
+            dbEntitiesList.removeAll(removePattern);
+            notifyDataSetChanged();
+        }
     }
 
+    public interface Listener{
+        void clickElement(List<MainCityModel> lists, int currentPosition);
+        void onItemClicked(int position);
+        boolean onItemLongClicked(int position);
+        boolean statusActionMode();
+    }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener{
-        TextView cityName, temp, data;
+        TextView cityName, temperature, data;
         ImageView img;
 
         public ViewHolder(CardView view) {
             super(view);
             cityName = (TextView) view.findViewById(R.id.city_name_card);
-            temp = (TextView) view.findViewById(R.id.temperature_card);
+            temperature = (TextView) view.findViewById(R.id.temperature_card);
             data = (TextView) view.findViewById(R.id.date_card);
             img = (ImageView) view.findViewById(R.id.img_card);
             view.setOnClickListener(this);
@@ -91,7 +110,7 @@ public class DBAdapter extends SelectableAdapter<DBAdapter.ViewHolder>  implemen
         public void onClick(View v) {
             if (dbAdapterListener != null){
                 if (dbAdapterListener.statusActionMode()){
-                    dbAdapterListener.clickElement(list, getPosition());
+                    dbAdapterListener.clickElement(dbEntitiesList, getPosition());
                 }else {
                     dbAdapterListener.onItemClicked(getPosition());
                 }
@@ -106,36 +125,5 @@ public class DBAdapter extends SelectableAdapter<DBAdapter.ViewHolder>  implemen
             return false;
         }
     }
-
-    public void deleteElements(ActionMode actionMode){
-        List<Integer> positionsList = new ArrayList<>(selectedItem.size());
-        for (int i = 0, n = selectedItem.size(); i < n; i ++){
-            positionsList.add(selectedItem.keyAt(i));
-        }
-
-        for (int i = 0, n = list.size(); i < n; i ++){
-            idList.add(list.get(i).getIdDB());
-        }
-        ArrayList<MainCityModel> models = new ArrayList<>();
-        for (int i = 0, n = positionsList.size(); i < n; i ++){
-            models.add(list.get(positionsList.get(i)));
-        }
-        Log.d(TAG, "size models = " + models.size());
-        dbHelper.deleteHistory(positionsList, idList);
-        if (actionMode != null){
-            actionMode.finish();
-            list.removeAll(models);
-            notifyDataSetChanged();
-        }
-
-    }
-
-    public interface Listener{
-        void clickElement(List<MainCityModel> lists, int currentPosition);
-        void onItemClicked(int position);
-        boolean onItemLongClicked(int position);
-        boolean statusActionMode();
-    }
-
 
 }

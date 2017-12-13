@@ -13,7 +13,6 @@ import java.util.List;
 public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH>{
 
     public SparseBooleanArray selectedItem;
-    public ArrayList<Integer> list = new ArrayList<>();
 
     public SelectableAdapter() {
         selectedItem = new SparseBooleanArray();

@@ -57,7 +57,6 @@ public class ItemFragment extends Fragment implements DBAdapter.Listener{
         return view;
     }
 
-
     @Override
     public void clickElement(List<MainCityModel> historyModel, int currentPosition) {
         WrapperMainCityModel cityModel = new WrapperMainCityModel();
@@ -69,7 +68,6 @@ public class ItemFragment extends Fragment implements DBAdapter.Listener{
                 .add(R.id.container, fragment)
                 .addToBackStack(null)
                 .commit();
-//        setHasOptionsMenu(false);
     }
 
     @Override
@@ -82,7 +80,6 @@ public class ItemFragment extends Fragment implements DBAdapter.Listener{
     private void toggleSelection(int position){
         adapter.toggleSelection(position);
         int count = adapter.getSelectedItemCount();
-
         if (count == 0){
             actionMode.finish();
         }else {

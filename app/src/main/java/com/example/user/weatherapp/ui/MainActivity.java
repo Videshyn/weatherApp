@@ -75,7 +75,6 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
     }
 
     private void getLocationFragment(){
-
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
             Log.d(TAG, "before location search");
             LocationServices
@@ -116,14 +115,12 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
                                 .beginTransaction()
                                 .replace(R.id.container, fragment)
                                 .commit();
-
                     }catch (NumberFormatException ex){
                         Toast.makeText(getBaseContext(), "NumberFormatException ", Toast.LENGTH_LONG).show();
                         setLocation();
                     }
                 })
                 .show();
-
     }
 
     private void startWeatherFragment() {
@@ -163,7 +160,6 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
         }else {
             ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE_REFRESH_COORDS);
         }
-
     }
 
 
@@ -174,19 +170,15 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
             case REQUEST_CODE_REFRESH_COORDS:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED ){
                     refreshCoords();
-
                 }else {
                     Toast.makeText(this, "Need permission", Toast.LENGTH_LONG).show();
-
                 }
                 break;
             case REQUEST_CODE_START_FRAGMENT:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                    getLocationFragment();
-
                 }else {
                     Toast.makeText(this, "Need permission", Toast.LENGTH_LONG).show();
-
                 }
                 break;
         }
@@ -227,7 +219,5 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
         if (progressDialog != null)
             progressDialog.dismiss();
     }
-
-
 
 }

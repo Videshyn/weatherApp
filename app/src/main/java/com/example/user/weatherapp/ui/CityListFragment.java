@@ -57,7 +57,6 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
     private SearchView searchView;
     public String lastCity;
     private Toolbar toolbar;
-    private boolean flag = false;
 
     public static CityListFragment newInstance(double lat, double lng) {
         Log.d(TAG, "call newInstance:");
@@ -68,6 +67,7 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
         fragment.setArguments(args);
         return fragment;
     }
+
     public int getElementsCount(){
         if (adapter != null){
             return adapter.getItemCount();
@@ -80,13 +80,11 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
     }
 
     private void callAPI(double latitude, double longitude){
-
         WeatherAPI.getClient().create(WeatherAPI.WeatherInterface.class)
                 .getAll(latitude, longitude, DEFAULT_CNT, KEY)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(example -> {
-                    Log.d(TAG, "callAPI: subscribe");
                     if (adapter != null){
                         adapter.updateList(example);
                     }else {
@@ -121,9 +119,7 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
         recyclerView = (RecyclerView) view.findViewById(R.id.rec);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(manager);
-
         callAPI(lat, lng);
-
         setHasOptionsMenu(true);
         return view;
     }
@@ -137,10 +133,7 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
                 .add(R.id.container, fragment)
                 .addToBackStack(null)
                 .commit();
-//        setHasOptionsMenu(false);
     }
-
-
 
     public void onLocationUpdate(Location location){
         lat = location.getLatitude();
@@ -154,14 +147,6 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
         listener.refreshCoords();
     }
 
-
-
-
-    public interface Listener {
-        void closeProgressDialog();
-        void refreshCoords();
-        void openProgressDialog();
-    }
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -185,8 +170,6 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu, menu);
         MenuItem searchItem = menu.findItem(R.id.search_item_menu);
-//        MenuItem history = menu.findItem(R.id.my_history);
-//        history.setVisible(true);
         searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setOnQueryTextListener(this);
         super.onCreateOptionsMenu(menu, inflater);
@@ -280,5 +263,11 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
     public void onResume() {
         super.onResume();
         setHasOptionsMenu(true);
+    }
+
+    public interface Listener {
+        void closeProgressDialog();
+        void refreshCoords();
+        void openProgressDialog();
     }
 }

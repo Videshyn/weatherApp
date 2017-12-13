@@ -28,7 +28,6 @@ import static com.example.user.weatherapp.utils.Const.PNG;
 public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHolder> {
 
     private static final String TAG = WeatherAdapter.class.getSimpleName();
-
     private Listener weatherAdapterListener;
     private MainCityModel exampleCity;
     private List<MainModelList> citiesList = new ArrayList<>();

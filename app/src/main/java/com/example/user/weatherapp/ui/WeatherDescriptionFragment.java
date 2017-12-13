@@ -86,6 +86,7 @@ public class WeatherDescriptionFragment extends Fragment {
         setHasOptionsMenu(true);
         return view;
     }
+
     private void callWeatherWeekAPI(ViewPager viewPager){
         listener.openProgressDialog();
         Integer idCity = 0;
@@ -151,15 +152,10 @@ public class WeatherDescriptionFragment extends Fragment {
         super.onPrepareOptionsMenu(menu);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        return false;
-    }
-
     class MyPagerAdapter extends FragmentStatePagerAdapter {
 
         private String json, city;
+
         public MyPagerAdapter(FragmentManager fm, String response, String cityName) {
             super(fm);
             json = response;
