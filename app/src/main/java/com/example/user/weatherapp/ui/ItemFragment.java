@@ -3,6 +3,7 @@ package com.example.user.weatherapp.ui;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -26,6 +27,9 @@ import static com.example.user.weatherapp.utils.Const.DB_CHECK;
 public class ItemFragment extends Fragment implements DBAdapter.Listener{
 
     private static final String TAG = ItemFragment.class.getSimpleName();
+    private DBAdapter adapter;
+    private ActionMode actionMode;
+    private ActionModeCallback actionModeCallback = new ActionModeCallback();
 
     public static ItemFragment newInstance() {
         return new ItemFragment();
@@ -41,7 +45,7 @@ public class ItemFragment extends Fragment implements DBAdapter.Listener{
 
         View view =  inflater.inflate(R.layout.fragment_item_list, null, false);
         RecyclerView recyclerView = view.findViewById(R.id.fragment_list_history);
-        DBAdapter adapter = new DBAdapter(getContext(), this);
+        adapter = new DBAdapter(getContext(), this);
         recyclerView.setAdapter(adapter);
         LinearLayoutManager manager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(manager);
@@ -58,13 +62,47 @@ public class ItemFragment extends Fragment implements DBAdapter.Listener{
     public void clickElement(List<MainCityModel> historyModel, int currentPosition) {
         WrapperMainCityModel cityModel = new WrapperMainCityModel();
         cityModel.setModelList(historyModel);
-        WeatherDescriptionFragment fragment = WeatherDescriptionFragment.newInstance(new Gson().toJson(cityModel, WrapperMainCityModel.class), DB_CHECK, currentPosition);
+        WeatherDescriptionFragment fragment = WeatherDescriptionFragment.newInstance(new Gson()
+                .toJson(cityModel, WrapperMainCityModel.class), DB_CHECK, currentPosition);
         getFragmentManager()
                 .beginTransaction()
                 .add(R.id.container, fragment)
                 .addToBackStack(null)
                 .commit();
 //        setHasOptionsMenu(false);
+    }
+
+    @Override
+    public void onItemClicked(int position) {
+        if (actionMode != null){
+            toggleSelection(position);
+        }
+    }
+
+    private void toggleSelection(int position){
+        adapter.toggleSelection(position);
+        int count = adapter.getSelectedItemCount();
+
+        if (count == 0){
+            actionMode.finish();
+        }else {
+            actionMode.setTitle(String.valueOf(count));
+            actionMode.invalidate();
+        }
+    }
+
+    @Override
+    public boolean onItemLongClicked(int position) {
+        if (actionMode == null){
+            actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(actionModeCallback);
+        }
+        toggleSelection(position);
+        return false;
+    }
+
+    @Override
+    public boolean statusActionMode() {
+        return actionMode == null;
     }
 
     @Override
@@ -93,5 +131,38 @@ public class ItemFragment extends Fragment implements DBAdapter.Listener{
                 return true;
         }
         return false;
+    }
+
+    private class ActionModeCallback implements ActionMode.Callback{
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            mode.getMenuInflater().inflate(R.menu.action_mode_menu, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.delete_am:
+
+                        return true;
+//                    case R.id.clear_selection_am:
+//                        adapter.clearSelection();
+//                        return true;
+                }
+            return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            adapter.clearSelection();
+            actionMode = null;
+        }
     }
 }

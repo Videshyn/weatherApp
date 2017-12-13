@@ -12,41 +12,41 @@ import java.util.List;
 
 public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH>{
 
-    private SparseBooleanArray selectedItems;
+    private SparseBooleanArray selectedItem;
 
     public SelectableAdapter() {
-        selectedItems = new SparseBooleanArray();
+        selectedItem = new SparseBooleanArray();
     }
 
-    public boolean isSelected(int position) {
-        return getSelectedItems().contains(position);
+    public boolean isSelected(int position){
+        return getSelectedItem().contains(position);
     }
 
     public void toggleSelection(int position){
-        if (selectedItems.get(position, false)){
-            selectedItems.delete(position);
+        if (selectedItem.get(position, false)){
+            selectedItem.delete(position);
         }else {
-            selectedItems.put(position, true);
+            selectedItem.put(position, true);
         }
         notifyItemChanged(position);
     }
 
     public void clearSelection(){
-        List<Integer> selection = getSelectedItems();
-        selectedItems.clear();
+        List<Integer> selection = getSelectedItem();
+        selectedItem.clear();
         for (Integer i : selection){
             notifyItemChanged(i);
         }
     }
 
     public int getSelectedItemCount(){
-        return selectedItems.size();
+        return selectedItem.size();
     }
 
-    public List<Integer> getSelectedItems() {
-        List<Integer> items = new ArrayList<>(selectedItems.size());
-        for (int i = 0; i < selectedItems.size(); i ++){
-            items.add(selectedItems.keyAt(i));
+    public List<Integer> getSelectedItem(){
+        List<Integer> items = new ArrayList<>(selectedItem.size());
+        for (int i = 0; i < selectedItem.size(); ++i){
+            items.add(selectedItem.keyAt(i));
         }
         return items;
     }

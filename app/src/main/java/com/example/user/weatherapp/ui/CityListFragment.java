@@ -44,7 +44,7 @@ import static com.example.user.weatherapp.utils.Const.LNG;
  */
 
 public class CityListFragment extends Fragment implements WeatherAdapter.Listener, SwipeRefreshLayout.OnRefreshListener,
-        SearchView.OnQueryTextListener, WeatherAdapter.CLickListener{
+        SearchView.OnQueryTextListener{
     private static final String TAG = CityListFragment.class.getSimpleName();
     private double lat;
     private double lng;
@@ -55,12 +55,9 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
     private MainCityModel citiesModel;
     private SwipeRefreshLayout swipeRefreshLayout;
     private SearchView searchView;
-    private boolean toolBarFlag = false;
     public String lastCity;
-    private ActionMode actionMode;
     private Toolbar toolbar;
     private boolean flag = false;
-    private ActionModeCallback actionModeCallback = new ActionModeCallback();
 
     public static CityListFragment newInstance(double lat, double lng) {
         Log.d(TAG, "call newInstance:");
@@ -93,7 +90,7 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
                     if (adapter != null){
                         adapter.updateList(example);
                     }else {
-                        adapter = new WeatherAdapter(example, this, this);
+                        adapter = new WeatherAdapter(example, this);
                     }
                     recyclerView.setAdapter(adapter);
                     if (listener != null){
@@ -120,9 +117,7 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.setColorSchemeColors(Color.BLUE, Color.GREEN, Color.RED, Color.YELLOW);
         toolbar = view.findViewById(R.id.toolbar_recycler);
-        if (actionMode == null){
-            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        }
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         recyclerView = (RecyclerView) view.findViewById(R.id.rec);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(manager);
@@ -243,7 +238,7 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
                     if (adapter != null){
                         adapter.updateList(example);
                     }else {
-                        adapter = new WeatherAdapter(example, this, this);
+                        adapter = new WeatherAdapter(example, this);
                     }
                     recyclerView.setAdapter(adapter);
                     setHomeButtonEnabled(true);
@@ -285,96 +280,5 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
     public void onResume() {
         super.onResume();
         setHasOptionsMenu(true);
-    }
-
-
-    @Override
-    public boolean createActionMode(ArrayList<Integer> list) {
-
-//        actionMode = getActivity().startActionMode();
-
-        return flag;
-    }
-//
-//    @Override
-//    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-//        mode.getMenuInflater().inflate(R.menu.action_mode_menu, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-//        switch (item.getItemId()){
-//            case R.id.clear_selection_am:
-//                clearSelected();
-//                return true;
-//
-//        }
-//        return false;
-//    }
-//
-//    @Override
-//    public void onDestroyActionMode(ActionMode mode) {
-//
-//    }
-
-    private void clearSelected(){
-        ArrayList<Integer> tmpList = adapter.getCountNotNullPosition();
-        adapter.getCountNotNullPosition().removeAll(tmpList);
-        ArrayList<Integer> tmpList2 = adapter.getCountNullPositions();
-        adapter.getCountNullPositions().removeAll(tmpList2);
-        adapter.notifyDataSetChanged();
-    }
-
-
-    @Override
-    public void omItemClicked(int position) {
-
-        if (actionMode != null){
-            // Выбор и снятие выбора с элемента при включеном режиме екшнмод
-        }
-    }
-
-    @Override
-    public boolean onItemLongClicked(int position) {
-        if (actionMode == null){
-            actionMode = getActivity().startActionMode(actionModeCallback);
-        }
-        return false;
-    }
-
-
-    private class ActionModeCallback implements ActionMode.Callback{
-
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            mode.getMenuInflater().inflate(R.menu.action_mode_menu, menu);
-            return false;
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false;
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            switch (item.getItemId()){
-            case R.id.clear_selection_am:
-                clearSelected();
-                return true;
-            }
-            return false;
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-
-        }
     }
 }
