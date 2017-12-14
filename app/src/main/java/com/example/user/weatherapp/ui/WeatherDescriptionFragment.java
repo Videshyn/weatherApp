@@ -30,6 +30,7 @@ import com.example.user.weatherapp.utils.Const;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -155,11 +156,21 @@ public class WeatherDescriptionFragment extends Fragment {
     class MyPagerAdapter extends FragmentStatePagerAdapter {
 
         private String json, city;
+        private int size;
+        private List<String> cityNames = new ArrayList<>();
 
         public MyPagerAdapter(FragmentManager fm, String response, String cityName) {
             super(fm);
             json = response;
             city = cityName;
+            size = new Gson()
+                    .fromJson(json, WrapperMainCityModel.class)
+                    .getModelList()
+                    .size();
+            List<MainCityModel> tmp = new Gson().fromJson(json, WrapperMainCityModel.class).getModelList();
+            for (int i = 0; i < size; i ++){
+                cityNames.add(i, tmp.get(i).getName());
+            }
         }
 
         @Override
@@ -170,10 +181,7 @@ public class WeatherDescriptionFragment extends Fragment {
         @Override
         public int getCount() {
             if (city == null){
-                return new Gson()
-                        .fromJson(json, WrapperMainCityModel.class)
-                        .getModelList()
-                        .size();
+                return size;
             }else
                 return Const.COUNT_DAYS;
         }
@@ -181,11 +189,12 @@ public class WeatherDescriptionFragment extends Fragment {
         @Override
         public CharSequence getPageTitle(int position) {
             if (city == null){
-                return new Gson()
-                        .fromJson(json, WrapperMainCityModel.class)
-                        .getModelList()
-                        .get(position)
-                        .getName();
+                return cityNames.get(position);
+//                return new Gson()
+//                        .fromJson(json, WrapperMainCityModel.class)
+//                        .getModelList()
+//                        .get(position)
+//                        .getName();
             }else {
                 switch (position){
                     case 0:
