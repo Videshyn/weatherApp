@@ -1,0 +1,17 @@
+Index: app/src/main/AndroidManifest.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/AndroidManifest.xml	(revision 3997c8932ed5c928e11ef6aa5673a097dcecbd93)
++++ app/src/main/AndroidManifest.xml	(revision )
+@@ -15,7 +15,8 @@
+         android:roundIcon="@mipmap/ic_launcher_round"
+         android:supportsRtl="true"
+         android:theme="@style/MyThemeWithoutActionBar">
+-        <activity android:name=".ui.MainActivity">
++        <activity android:name=".ui.MainActivity"
++            android:screenOrientation="portrait">
+             <intent-filter>
+                 <action android:name="android.intent.action.MAIN" />
+ 
