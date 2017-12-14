@@ -163,14 +163,17 @@ public class WeatherDescriptionFragment extends Fragment {
             super(fm);
             json = response;
             city = cityName;
-            size = new Gson()
-                    .fromJson(json, WrapperMainCityModel.class)
-                    .getModelList()
-                    .size();
-            List<MainCityModel> tmp = new Gson().fromJson(json, WrapperMainCityModel.class).getModelList();
-            for (int i = 0; i < size; i ++){
-                cityNames.add(i, tmp.get(i).getName());
+            if (city == null){
+                size = new Gson()
+                        .fromJson(json, WrapperMainCityModel.class)
+                        .getModelList()
+                        .size();
+                List<MainCityModel> tmp = new Gson().fromJson(json, WrapperMainCityModel.class).getModelList();
+                for (int i = 0; i < size; i ++){
+                    cityNames.add(i, tmp.get(i).getName());
+                }
             }
+
         }
 
         @Override
