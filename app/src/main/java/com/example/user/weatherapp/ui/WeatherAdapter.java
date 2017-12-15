@@ -39,12 +39,15 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
     }
 
     public void updateList(MainCityModel exampleCity){
+        Log.d(TAG, "updateList: ");
         this.exampleCity = exampleCity;
+        citiesList = exampleCity.getList();
         notifyDataSetChanged();
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        Log.d(TAG, "onCreateViewHolder: ");
         CardView cardView = (CardView) LayoutInflater.from(parent.getContext()).inflate(R.layout.card, parent, false);
         return new WeatherAdapter.ViewHolder(cardView);
     }
@@ -73,12 +76,14 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
     }
 
     private void bindNullCount(ViewHolder holder){
+        Log.d(TAG, "call nullCount");
         Glide.with(holder.img.getContext()).load(ICON_URL + exampleCity.getWeather().get(0).getIcon() + PNG).into(holder.img);
         holder.cityName.setText(exampleCity.getName());
         holder.temperature.setText("" + new BigDecimal(exampleCity.getMain().getTemp() - 273.15).setScale(1, BigDecimal.ROUND_UP));
     }
 
     private void bildNotNullCount(ViewHolder holder, final int position){
+        Log.d(TAG, "call notNullCount");
         Glide.with(holder.img.getContext()).load(ICON_URL + citiesList.get(position).getWeather().get(0).getIcon() + PNG).into(holder.img);
         holder.cityName.setText(citiesList.get(position).getName());
         holder.temperature.setText("" + new BigDecimal(citiesList.get(position).getMain().getTemp() - 273.15).setScale(1, BigDecimal.ROUND_UP));
@@ -87,6 +92,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
+        Log.d(TAG, "call bind");
         if (exampleCity.getCount() == null){
             bindNullCount(holder);
         }else if (exampleCity.getCount() > 0){

@@ -79,14 +79,17 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
         lng = getArguments().getDouble(LNG);
     }
 
-    private void callAPI(double latitude, double longitude){
+    public void callAPI(double latitude, double longitude){
         WeatherAPI.getClient().create(WeatherAPI.WeatherInterface.class)
                 .getAll(latitude, longitude, DEFAULT_CNT, KEY)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(example -> {
+                    Log.d(TAG, "adapter = " + (adapter == null));
                     if (adapter != null){
                         adapter.updateList(example);
+                        Log.d(TAG, "update ");
+
                     }else {
                         adapter = new WeatherAdapter(example, this);
                     }
@@ -97,7 +100,12 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
                     if (swipeRefreshLayout.isRefreshing()){
                         swipeRefreshLayout.setRefreshing(false);
                     }
+                }, error -> {
+                    swipeRefreshLayout.setRefreshing(false);
+                    Toast.makeText(getContext(), "Bad request", Toast.LENGTH_SHORT).show();
+                    listener.refreshCoords(swipeRefreshLayout);
                 });
+
     }
 
     @Override
@@ -144,7 +152,8 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
     @Override
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(true);
-        listener.refreshCoords();
+        listener.refreshCoords(swipeRefreshLayout);
+        Log.d(TAG, "swipe = " + (swipeRefreshLayout == null));
     }
 
     @Override
@@ -267,7 +276,7 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
 
     public interface Listener {
         void closeProgressDialog();
-        void refreshCoords();
+        void refreshCoords(SwipeRefreshLayout swipeRefreshLayout);
         void openProgressDialog();
     }
 }

@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,8 +15,10 @@ import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.example.user.weatherapp.R;
@@ -90,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
                                     .replace(R.id.container, fragment)
                                     .commit();
                         }else {
-                            setLocation();
+                            setLocation(null);
                         }
                     });
         }else {
@@ -98,26 +101,36 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
         }
     }
 
-    private void setLocation(){
+    private void setLocation(SwipeRefreshLayout swipeRefreshLayout){
         final View view = View.inflate(getBaseContext(), R.layout.dialog_location, null);
         final EditText latET = view.findViewById(R.id.latET);
         final EditText lonET = view.findViewById(R.id.lonET);
+        if (swipeRefreshLayout != null){
+            swipeRefreshLayout.setRefreshing(true);
+        }
         new AlertDialog.Builder(this)
                 .setTitle(R.string.location_erro)
                 .setMessage(R.string.enter_coords)
                 .setView(view)
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                     try {
+                        if (swipeRefreshLayout != null){
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
                         double mLat = Double.parseDouble(latET.getText().toString());
                         double mLon = Double.parseDouble(lonET.getText().toString());
-                        fragment = CityListFragment.newInstance(mLat, mLon);
-                        getSupportFragmentManager()
-                                .beginTransaction()
-                                .replace(R.id.container, fragment)
-                                .commit();
+                        if (fragment == null){
+                            fragment = CityListFragment.newInstance(mLat, mLon);
+                            getSupportFragmentManager()
+                                    .beginTransaction()
+                                    .replace(R.id.container, fragment)
+                                    .commit();
+                        }else {
+                            fragment.callAPI(mLat, mLon);
+                        }
                     }catch (NumberFormatException ex){
                         Toast.makeText(getBaseContext(), "NumberFormatException ", Toast.LENGTH_LONG).show();
-                        setLocation();
+                        setLocation(swipeRefreshLayout);
                     }
                 })
                 .show();
@@ -145,16 +158,26 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
 
 
     @Override
-    public void refreshCoords() {
+    public void refreshCoords(SwipeRefreshLayout swipeRefreshLayout) {
+        if (swipeRefreshLayout != null){
+            swipeRefreshLayout.setRefreshing(true);
+        }
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
             LocationServices
                     .getFusedLocationProviderClient(this)
                     .getLastLocation()
                     .addOnSuccessListener(this, location -> {
-                        if (location != null)
+                        Log.d(TAG, "location = " + (location == null));
+                        Log.d(TAG, "swipe = " + (swipeRefreshLayout == null));
+                        if (location != null){
                             fragment.onLocationUpdate(location);
+                            if (swipeRefreshLayout != null){
+                                swipeRefreshLayout.setRefreshing(false);
+                            }
+                        }
                         else {
-                            setLocation();
+                            setLocation(swipeRefreshLayout);
+
                         }
                     });
         }else {
@@ -169,7 +192,7 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
         switch (requestCode){
             case REQUEST_CODE_REFRESH_COORDS:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED ){
-                    refreshCoords();
+                    refreshCoords(null);
                 }else {
                     Toast.makeText(this, "Need permission", Toast.LENGTH_LONG).show();
                 }
