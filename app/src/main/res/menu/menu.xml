@@ -36,5 +36,16 @@
             />
     </group>
 
+    <group
+        android:id="@+id/maps_group">
+
+        <item
+            android:id="@+id/my_map"
+            android:title="@string/map"
+            android:icon="@drawable/location"
+            app:showAsAction="always"/>
+
+    </group>
+
 
 </menu>

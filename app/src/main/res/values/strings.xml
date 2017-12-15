@@ -36,4 +36,6 @@
     <string name="wind_speed">Wind Speed =</string>
     <string name="clear_selection">clear_selection</string>
     <string name="delete">delete</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="map">map</string>
 </resources>

@@ -1,6 +1,7 @@
 package com.example.user.weatherapp.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
@@ -187,6 +188,7 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         menu.setGroupVisible(R.id.group_add, false);
+        menu.setGroupVisible(R.id.maps_group, true);
         super.onPrepareOptionsMenu(menu);
     }
 
@@ -205,6 +207,13 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
                 }catch (Exception ex){
                     Log.d(TAG, "ex = " + ex.getMessage().toString());
                 }
+                return true;
+            case R.id.my_map:
+                Log.d(TAG, "my map");
+                Intent mapIntent = new Intent(getActivity(), MapsActivity.class);
+                mapIntent.putExtra("lat", lat);
+                mapIntent.putExtra("lon", lng);
+                startActivity(mapIntent);
                 return true;
         }
         return false;

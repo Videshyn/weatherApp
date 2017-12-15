@@ -50,6 +50,7 @@ public class WeatherPagerFragment extends Fragment{
     private WrapperMainCityModel wrapperMainCityModel;
     private TextView temperature, temperatureMax, temperatureMin, pressure, humidity, description, wind;
     private DBHelper dbHelper;
+    private double lat, lng;
 
     public static WeatherPagerFragment newInstance(String responce, int pagerPosition, String cityName) {
         Log.d(TAG, "call newInstance:");
@@ -82,9 +83,11 @@ public class WeatherPagerFragment extends Fragment{
         Log.d(TAG, "response = " + response);
         if (cityName == null){
             wrapperMainCityModel = new Gson().fromJson(response, WrapperMainCityModel.class);
+
         }else {
             weatherMapJSON = new Gson().fromJson(response, OpenWeatherMapJSON.class);
         }
+
         super.onCreate(savedInstanceState);
     }
 
