@@ -36,8 +36,7 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
         setContentView(R.layout.activity_main);
         JodaTimeAndroid.init(this);
         Log.d(TAG, "onCreate: start");
-//        latET = (EditText) findViewById(R.id.latET);
-//        lonET = (EditText) findViewById(R.id.lonET);
+// TODO: 18.12.2017 delete in next year
 //        WeatherAPI.WeekResponce api = WeatherAPI.getClient().create(WeatherAPI.WeekResponce.class);
 //        Call<WeekWeather> call = api.getWeek(706483, Const.KEY);
 //
@@ -60,12 +59,7 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
         }
     }
 
-    private void showProgressDialog() {
-        progressDialog = new ProgressDialog(this);
-        Log.d(TAG, "showProgressDialog: ");
-        progressDialog.setTitle(R.string.title_progress_dialog);
-        progressDialog.show();
-    }
+
 
     private void initLocation(){
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
@@ -117,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
     }
 
     private void startWeatherFragment() {
-        showProgressDialog();
+        openProgressDialog();
         Log.d(TAG, "startWeatherFragment: ");
         initLocation();
     }
@@ -206,7 +200,10 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
 
     @Override
     public void openProgressDialog() {
-        showProgressDialog();
+        progressDialog = new ProgressDialog(this);
+        Log.d(TAG, "showProgressDialog: ");
+        progressDialog.setTitle(R.string.title_progress_dialog);
+        progressDialog.show();
     }
 
     @Override
