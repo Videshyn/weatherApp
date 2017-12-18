@@ -3,22 +3,16 @@ package com.example.user.weatherapp.ui;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
-import android.view.ActionMode;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.example.user.weatherapp.R;
@@ -27,9 +21,6 @@ import com.google.android.gms.location.LocationServices;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
-import java.security.PrivateKey;
-import java.util.ArrayList;
-
 public class MainActivity extends AppCompatActivity implements CityListFragment.Listener{
 
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -37,7 +28,6 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
     private ProgressDialog progressDialog;
     private CityListFragment fragment;
     private static final int REQUEST_CODE_START_FRAGMENT = 400;
-    private EditText latET, lonET;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +36,8 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
         setContentView(R.layout.activity_main);
         JodaTimeAndroid.init(this);
         Log.d(TAG, "onCreate: start");
-        latET = (EditText) findViewById(R.id.latET);
-        lonET = (EditText) findViewById(R.id.lonET);
+//        latET = (EditText) findViewById(R.id.latET);
+//        lonET = (EditText) findViewById(R.id.lonET);
 //        WeatherAPI.WeekResponce api = WeatherAPI.getClient().create(WeatherAPI.WeekResponce.class);
 //        Call<WeekWeather> call = api.getWeek(706483, Const.KEY);
 //
@@ -77,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
         progressDialog.show();
     }
 
-    private void getLocationFragment(){
+    private void initLocation(){
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
             Log.d(TAG, "before location search");
             LocationServices
@@ -93,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
                                     .replace(R.id.container, fragment)
                                     .commit();
                         }else {
-                            setLocation(null);
+                            showChooseLocationDialog();
                         }
                     });
         }else {
@@ -101,36 +91,26 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
         }
     }
 
-    private void setLocation(SwipeRefreshLayout swipeRefreshLayout){
+    private void showChooseLocationDialog(){
         final View view = View.inflate(getBaseContext(), R.layout.dialog_location, null);
         final EditText latET = view.findViewById(R.id.latET);
         final EditText lonET = view.findViewById(R.id.lonET);
-        if (swipeRefreshLayout != null){
-            swipeRefreshLayout.setRefreshing(true);
-        }
+
         new AlertDialog.Builder(this)
                 .setTitle(R.string.location_erro)
                 .setMessage(R.string.enter_coords)
                 .setView(view)
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                    try {
-                        if (swipeRefreshLayout != null){
-                            swipeRefreshLayout.setRefreshing(false);
-                        }
-                        double mLat = Double.parseDouble(latET.getText().toString());
-                        double mLon = Double.parseDouble(lonET.getText().toString());
-                        if (fragment == null){
-                            fragment = CityListFragment.newInstance(mLat, mLon);
-                            getSupportFragmentManager()
-                                    .beginTransaction()
-                                    .replace(R.id.container, fragment)
-                                    .commit();
-                        }else {
-                            fragment.callAPI(mLat, mLon);
-                        }
-                    }catch (NumberFormatException ex){
-                        Toast.makeText(getBaseContext(), "NumberFormatException ", Toast.LENGTH_LONG).show();
-                        setLocation(swipeRefreshLayout);
+                    double mLat = Double.parseDouble(latET.getText().toString());
+                    double mLon = Double.parseDouble(lonET.getText().toString());
+                    if (fragment == null){
+                        fragment = CityListFragment.newInstance(mLat, mLon);
+                        getSupportFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.container, fragment)
+                                .commit();
+                    }else {
+                        fragment.callAPI(mLat, mLon);
                     }
                 })
                 .show();
@@ -139,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
     private void startWeatherFragment() {
         showProgressDialog();
         Log.d(TAG, "startWeatherFragment: ");
-        getLocationFragment();
+        initLocation();
     }
 
     private void showErrorDialog() {
@@ -158,26 +138,18 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
 
 
     @Override
-    public void refreshCoords(SwipeRefreshLayout swipeRefreshLayout) {
-        if (swipeRefreshLayout != null){
-            swipeRefreshLayout.setRefreshing(true);
-        }
+    public void refreshCoords() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
             LocationServices
                     .getFusedLocationProviderClient(this)
                     .getLastLocation()
                     .addOnSuccessListener(this, location -> {
                         Log.d(TAG, "location = " + (location == null));
-                        Log.d(TAG, "swipe = " + (swipeRefreshLayout == null));
                         if (location != null){
                             fragment.onLocationUpdate(location);
-                            if (swipeRefreshLayout != null){
-                                swipeRefreshLayout.setRefreshing(false);
-                            }
                         }
                         else {
-                            setLocation(swipeRefreshLayout);
-
+                            showChooseLocationDialog();
                         }
                     });
         }else {
@@ -192,14 +164,14 @@ public class MainActivity extends AppCompatActivity implements CityListFragment.
         switch (requestCode){
             case REQUEST_CODE_REFRESH_COORDS:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED ){
-                    refreshCoords(null);
+                    refreshCoords();
                 }else {
                     Toast.makeText(this, "Need permission", Toast.LENGTH_LONG).show();
                 }
                 break;
             case REQUEST_CODE_START_FRAGMENT:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                   getLocationFragment();
+                   initLocation();
                 }else {
                     Toast.makeText(this, "Need permission", Toast.LENGTH_LONG).show();
                 }

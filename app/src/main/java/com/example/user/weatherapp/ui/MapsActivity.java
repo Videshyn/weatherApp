@@ -26,11 +26,11 @@ import java.util.Locale;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, AdapterView.OnItemSelectedListener {
 
-    public static String KEY = "9f6dc9e441d2f589ff7e472d7d352a61";
+    public static String KEY = "a982fb91a700e16c4d7aed2dac47cc95";
     private GoogleMap mMap;
     private double lat, lon;
     TileOverlay tileOverlay;
-    String[] data = {"clouds_new", "precipitation_new", "pressure_new", "wind_new", "temp_new"};
+    String[] data = {"none","clouds_new", "precipitation_new", "pressure_new", "wind_new", "temp_new"};
     String choose = "temp_new";
 
 
@@ -123,23 +123,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         switch (position){
             case 0:
-                choose = "clouds_new";
-                getTileOverlay(getTileProvider());
+                choose = data[0];
+                mMap.clear();
                 break;
             case 1:
-                choose = "precipitation_new";
+                mMap.clear();
+                choose = data[1];
                 getTileOverlay(getTileProvider());
                 break;
             case 2:
-                choose = "pressure_new";
+                mMap.clear();
+
+                choose = data[2];
                 getTileOverlay(getTileProvider());
                 break;
             case 3:
-                choose = "wind_new";
+                mMap.clear();
+                choose = data[3];
                 getTileOverlay(getTileProvider());
                 break;
             case 4:
-                choose = "temp_new";
+                mMap.clear();
+                choose = data[4];
+                getTileOverlay(getTileProvider());
+                break;
+            case 5:
+                mMap.clear();
+                choose = data[5];
                 getTileOverlay(getTileProvider());
                 break;
         }

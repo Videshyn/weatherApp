@@ -98,13 +98,11 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
                     if (listener != null){
                         listener.closeProgressDialog();
                     }
-                    if (swipeRefreshLayout.isRefreshing()){
-                        swipeRefreshLayout.setRefreshing(false);
-                    }
+                    swipeRefreshLayout.setRefreshing(false);
                 }, error -> {
                     swipeRefreshLayout.setRefreshing(false);
                     Toast.makeText(getContext(), "Bad request", Toast.LENGTH_SHORT).show();
-                    listener.refreshCoords(swipeRefreshLayout);
+                    swipeRefreshLayout.setRefreshing(true);
                 });
 
     }
@@ -153,7 +151,7 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
     @Override
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(true);
-        listener.refreshCoords(swipeRefreshLayout);
+        listener.refreshCoords();
         Log.d(TAG, "swipe = " + (swipeRefreshLayout == null));
     }
 
@@ -285,7 +283,7 @@ public class CityListFragment extends Fragment implements WeatherAdapter.Listene
 
     public interface Listener {
         void closeProgressDialog();
-        void refreshCoords(SwipeRefreshLayout swipeRefreshLayout);
+        void refreshCoords();
         void openProgressDialog();
     }
 }

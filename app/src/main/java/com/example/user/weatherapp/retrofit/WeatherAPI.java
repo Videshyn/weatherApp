@@ -17,7 +17,7 @@ import retrofit2.http.Query;
 public class WeatherAPI {
 
     private static final String TAG = "logs";
-    public static String KEY = "9f6dc9e441d2f589ff7e472d7d352a61";
+    public static String KEY = "a982fb91a700e16c4d7aed2dac47cc95";
     public static final String BASE_URL = "http://api.openweathermap.org/data/2.5/";
     private static Retrofit retrofit = null;
 
