@@ -3,6 +3,7 @@ package com.example.user.weatherapp.ui;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -26,11 +27,12 @@ import java.util.Locale;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, AdapterView.OnItemSelectedListener {
 
+    private static final String TAG = MapsActivity.class.getSimpleName();
     public static String KEY = "a982fb91a700e16c4d7aed2dac47cc95";
     private GoogleMap mMap;
     private double lat, lon;
     TileOverlay tileOverlay;
-    String[] data = {"none","clouds_new", "precipitation_new", "pressure_new", "wind_new", "temp_new"};
+    String[] data = {"none", "clouds_new", "precipitation_new", "pressure_new", "wind_new", "temp_new"};
     String choose = "temp_new";
 
 
@@ -70,6 +72,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        Intent intent = getIntent();
+        lon = intent.getDoubleExtra("lon", 0);
+        lat = intent.getDoubleExtra("lat", 0);
+
+
+
     }
 
 
@@ -84,9 +93,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Intent intent = getIntent();
-        lon = intent.getDoubleExtra("lon", 0);
-        lat = intent.getDoubleExtra("lat", 0);
+
 //        mMap = googleMap;
 //
 //        // Add a marker in Sydney and move the camera
@@ -99,12 +106,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         spinner.setAdapter(adapter);
 
         spinner.setOnItemSelectedListener(this);
+        Log.d(TAG, "onMapReady: ");
 
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-        LatLng sydney = new LatLng(lat, lon);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("lat = " + lat + " lng = " + lon));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 8));
+
 //        LatLng indy = new LatLng(50, 36);
 //        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(indy, 8));
 
@@ -119,38 +125,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         tileOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider(tileProvider).fadeIn(true));
     }
 
+    private void setMarker(){
+        LatLng sydney = new LatLng(lat, lon);
+        mMap.addMarker(new MarkerOptions().position(sydney).title("lat = " + lat + " lng = " + lon));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 8));
+    }
+
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         switch (position){
             case 0:
                 choose = data[0];
                 mMap.clear();
+                setMarker();
                 break;
             case 1:
                 mMap.clear();
                 choose = data[1];
                 getTileOverlay(getTileProvider());
+                setMarker();
                 break;
             case 2:
                 mMap.clear();
 
                 choose = data[2];
                 getTileOverlay(getTileProvider());
+                setMarker();
                 break;
             case 3:
                 mMap.clear();
                 choose = data[3];
                 getTileOverlay(getTileProvider());
+                setMarker();
                 break;
             case 4:
                 mMap.clear();
                 choose = data[4];
                 getTileOverlay(getTileProvider());
+                setMarker();
                 break;
             case 5:
                 mMap.clear();
                 choose = data[5];
                 getTileOverlay(getTileProvider());
+                setMarker();
                 break;
         }
     }
